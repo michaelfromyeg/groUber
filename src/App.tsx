@@ -1,18 +1,21 @@
 import React from 'react';
-import logo from './logo.png';
-import styles from './App.module.scss';
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Index from './pages/index'
+import NotFound from './pages/404'
 
-function App() {
-  return (
-    <div className={styles.app}>
-      <header className={styles.header}>
-        <img src={logo} className={styles.logo} alt="logo" />
-        <p>
-          <code>console.log(Hello, world!)</code>
-        </p>
-      </header>
-    </div>
+const app = () => {
+  return (  
+    <Router>
+        <Switch>
+          <Route exact path="/">
+            <Index />
+          </Route>
+          <Route path="*">
+            <NotFound />
+          </Route>
+        </Switch>
+    </Router>
   );
 }
 
-export default App;
+export default app;
