@@ -1,8 +1,8 @@
 import React from 'react'
 import styles from '../styles/App.module.scss'
-import EventForm from '../components/EventForm'
+import GuestForm from '../components/GuestForm'
 
-const index = () => {
+const Form = () => {
 
   // const getFunction = async () => {
   //   const eventSnapshot = await db.collection("events").get()
@@ -18,13 +18,13 @@ const index = () => {
       <header className={styles.header}>
         <img src={'/logo.png'} className={styles.logo} alt="logo" />
         <p>
-          <code>Create carpools, without the headache.</code>
-          <EventForm />
+          <code>console.log(Hello, world!)</code>
+          <GuestForm />
         </p>
       </header>
     </div>
   )
 }
 
-export default index
+export default Form
 

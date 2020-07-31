@@ -1,6 +1,6 @@
-import React from 'react';
-import styles from '../styles/App.module.scss';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import styles from '../styles/App.module.scss'
+import { Link } from 'react-router-dom'
 
 const index = () => {
   return (
@@ -16,7 +16,7 @@ const index = () => {
         </p>
       </header>
     </div>
-  );
+  )
 }
 
-export default index;
+export default index
