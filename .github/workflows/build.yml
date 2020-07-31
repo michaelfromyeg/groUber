@@ -13,6 +13,8 @@ jobs:
         uses: actions/checkout@master
       - name: Install Dependencies
         run: npm install
+      - name: Install TSLint Globally
+        run: npm install -g tslint
       - name: Build
         run: npm run build
       - name: Deploy to Firebase
