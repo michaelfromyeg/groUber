@@ -21,6 +21,9 @@ jobs:
           args: deploy --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: Install Dependencies for Firebase Functions
+        run: npm install
+        working-directory: ./functions
       - name: Deploy to Firebase Functions
         uses: w9jds/firebase-action@master
         with:
