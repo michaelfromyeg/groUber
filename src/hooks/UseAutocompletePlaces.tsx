@@ -7,10 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
-import {
-  geocodeByAddress,
-  getLatLng,
-} from 'react-places-autocomplete';
+import { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 
 function loadScript(src: string, position: HTMLElement | null, id: string) {
   if (!position) {
@@ -29,8 +26,8 @@ const autocompleteService: any = { current: null };
 const useStyles = makeStyles((theme) => ({
   icon: {
     color: theme.palette.text.secondary,
-    marginRight: theme.spacing(2),
-  },
+    marginRight: theme.spacing(2)
+  }
 }));
 
 interface PlaceType {
@@ -42,12 +39,12 @@ interface PlaceType {
       {
         offset: number;
         length: number;
-      },
+      }
     ];
   };
 }
 
-export default function useAutocompletePlaces(locationType : string) {
+export default function useAutocompletePlaces(locationType: string) {
   const classes = useStyles();
   const [value, setValue] = React.useState<PlaceType | null>(null);
   const [inputValue, setInputValue] = React.useState('');
@@ -61,10 +58,19 @@ export default function useAutocompletePlaces(locationType : string) {
 
   const fetch = React.useMemo(
     () =>
-      throttle((request: { input: string }, callback: (results?: PlaceType[]) => void) => {
-        (autocompleteService.current as any).getPlacePredictions(request, callback);
-      }, 200),
-    [],
+      throttle(
+        (
+          request: { input: string },
+          callback: (results?: PlaceType[]) => void
+        ) => {
+          (autocompleteService.current as any).getPlacePredictions(
+            request,
+            callback
+          );
+        },
+        200
+      ),
+    []
   );
 
   React.useEffect(() => {
@@ -106,7 +112,9 @@ export default function useAutocompletePlaces(locationType : string) {
   const render = (
     <Autocomplete
       id="google-map-demo"
-      getOptionLabel={(option) => (typeof option === 'string' ? option : option.description)}
+      getOptionLabel={(option) =>
+        typeof option === 'string' ? option : option.description
+      }
       filterOptions={(x) => x}
       options={options}
       autoComplete
@@ -116,7 +124,10 @@ export default function useAutocompletePlaces(locationType : string) {
       onChange={async (event: any, newValue: any) => {
         setOptions(newValue ? [newValue, ...options] : options);
         setValue(newValue);
-        const address = typeof newValue === 'string' ? newValue : (newValue as PlaceType).description
+        const address =
+          typeof newValue === 'string'
+            ? newValue
+            : (newValue as PlaceType).description;
 
         const results = await geocodeByAddress(address);
         const latlng = await getLatLng(results[0]);
@@ -126,13 +137,24 @@ export default function useAutocompletePlaces(locationType : string) {
         setInputValue(newInputValue);
       }}
       renderInput={(params) => (
-        <TextField required margin="normal" {...params} label= {locationType} variant="outlined" fullWidth />
+        <TextField
+          required
+          margin="normal"
+          {...params}
+          label={locationType}
+          variant="outlined"
+          fullWidth
+        />
       )}
       renderOption={(option) => {
-        const matches = option.structured_formatting.main_text_matched_substrings;
+        const matches =
+          option.structured_formatting.main_text_matched_substrings;
         const parts = parse(
           option.structured_formatting.main_text,
-          matches.map((match: any) => [match.offset, match.offset + match.length]),
+          matches.map((match: any) => [
+            match.offset,
+            match.offset + match.length
+          ])
         );
 
         return (
@@ -142,7 +164,10 @@ export default function useAutocompletePlaces(locationType : string) {
             </Grid>
             <Grid item xs>
               {parts.map((part: any, index: any) => (
-                <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                <span
+                  key={index}
+                  style={{ fontWeight: part.highlight ? 700 : 400 }}
+                >
                   {part.text}
                 </span>
               ))}
@@ -156,11 +181,10 @@ export default function useAutocompletePlaces(locationType : string) {
     />
   );
 
-  const address = typeof inputValue === 'string' ? inputValue : (inputValue as PlaceType).description;
+  const address =
+    typeof inputValue === 'string'
+      ? inputValue
+      : (inputValue as PlaceType).description;
 
-  return [
-    address,
-    latLng,
-    render,
-  ];
+  return [address, latLng, render];
 }
