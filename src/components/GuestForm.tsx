@@ -70,7 +70,11 @@ function GuestForm () {
     e.preventDefault()
     let result = await db.collection('people').add({
       name,
-      address,
+      location: {
+        address,
+        latlng
+      },
+      canDrive: checked,
       email,
       seats: checked ? Number(seats) : 0,
       event: event.ref,
