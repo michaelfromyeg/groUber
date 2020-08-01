@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as firebase from 'firebase';
 import { Event } from '../_types/event';
 import { useParams, useHistory } from 'react-router-dom';
@@ -7,8 +7,9 @@ import { AppBar, Toolbar, IconButton, Typography, Button, makeStyles, Grid } fro
 import classes from '*.module.css';
 import BackIcon from '@material-ui/icons/ArrowBackIosRounded';
 import Map from '../components/Map';
-import ListView from '../components/ListView';
+import ListView from '../components/PeopleList';
 import useEventPeople from 'src/hooks/useEventPeople';
+import Header from '../components/Header';
 
 const useStyles = makeStyles((theme) => ({
     menuButton: {
@@ -18,8 +19,8 @@ const useStyles = makeStyles((theme) => ({
 
 //eslint-disable-next-line
 const globalAny: any = global
-// some shit
-const DashBoard = () => {
+
+const Dashboard = () => {
     const classes = useStyles();
     const { eventId } = useParams();
     const history = useHistory();
@@ -42,7 +43,7 @@ const DashBoard = () => {
 
     const event = eventData?.data();
 
-    React.useEffect(() => {
+    useEffect(() => {
         const showPosition = (position: any) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
@@ -57,29 +58,13 @@ const DashBoard = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
         } else {
-            // eslint-disable-next-line @typescript-eslint/quotes
-            alert("your browser doesn't support maps");
+            alert(`Your browser doesn't support maps. Sorry about that :(`);
         }
     }, []);
 
     return (
         <>
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton
-                        edge="start"
-                        className={classes.menuButton}
-                        color="inherit"
-                        aria-label="menu"
-                        onClick={() => {
-                            history.push('/');
-                        }}
-                    >
-                        <BackIcon />
-                    </IconButton>
-                    <Typography variant="h6">groUber</Typography>
-                </Toolbar>
-            </AppBar>
+            <Header />
 
             {/* Load map */}
             {/* Load side-menu */}
@@ -91,4 +76,4 @@ const DashBoard = () => {
     );
 };
 
-export default DashBoard;
+export default Dashboard;
