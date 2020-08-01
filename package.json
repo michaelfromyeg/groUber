@@ -24,6 +24,7 @@
     "eslint-plugin-react": "^7.20.5",
     "firebase": "^7.17.1",
     "firebase-admin": "^9.0.0",
+    "google-maps-react": "^2.0.6",
     "lodash": "^4.17.19",
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
