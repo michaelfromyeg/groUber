@@ -1,7 +1,6 @@
 import React from 'react'
 import styles from '../styles/App.module.scss'
 import EventForm from '../components/EventForm'
-import GuestDetails from '../components/GuestDetails'
 
 const index = () => {
 
