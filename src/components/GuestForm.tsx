@@ -66,8 +66,9 @@ function GuestForm() {
     eventHost?.get()?.then((host) => {
         setHost(host.data() as People);
     });
-    const currentUser = firebase.auth().currentUser;
 
+    const currentUser = firebase.auth().currentUser;
+    console.log(currentUser);
     async function handleSubmit(e: any) {
         e.preventDefault();
         const result = await db.collection('people').add({
