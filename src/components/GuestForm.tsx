@@ -15,9 +15,11 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as firebase from 'firebase';
 import { useHistory, useParams } from 'react-router-dom';
 import PlacesAutocomplete, { geocodeByAddress, getLatLng, Suggestion } from 'react-places-autocomplete';
-import useAutoCompletePlaces from '../hooks/useAutocompletePlaces';
-import { Radio, Collapse } from '@material-ui/core';
+import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces';
+import { Radio, Collapse, Divider } from '@material-ui/core';
 import { useDocument } from 'react-firebase-hooks/firestore';
+import { Event } from '../_types/event';
+import 'firebase/auth';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -51,29 +53,29 @@ function GuestForm() {
         },
     });
 
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
     const [address, latlng, AutoCompletePlaces] = useAutoCompletePlaces('Add Your Location');
     const [seats, setSeats] = useState('0');
     const [submitted, setSubmit] = useState<boolean>(false);
 
     const [checked, setChecked] = React.useState(false);
 
+    const eventData: Event = event?.data();
+    const currentUser = firebase.auth().currentUser;
+
     async function handleSubmit(e: any) {
         e.preventDefault();
         const result = await db.collection('people').add({
-            name,
+            name: currentUser.displayName,
+            email: currentUser.email,
+            profilePicture: currentUser.photoURL,
+            userId: currentUser.uid,
+            canDrive: checked ? Number(seats) : 0,
+            seats: 0,
             location: {
-                address,
                 latlng,
+                address,
             },
-            canDrive: checked,
-            email,
-            seats: checked ? Number(seats) : 0,
-            event: event.ref,
         });
-
-        console.log(result);
 
         await event.ref.update({
             people: firebase.firestore.FieldValue.arrayUnion(result),
@@ -89,31 +91,21 @@ function GuestForm() {
                     <CssBaseline />
                     <div className={classes.paper}>
                         <Typography component="h1" variant="h5">
-                            Submit Your Information
+                            {eventData?.organizerName} is inviting you to attend {eventData?.name}.
                         </Typography>
+                        <br />
+                        <Typography component="h1" variant="h5">
+                            This event is at {eventData?.destination?.address}.
+                        </Typography>
+                        <br />
+                        <Typography component="h3" variant="h6">
+                            You are RSVPing as: {currentUser?.displayName} ({currentUser?.email})
+                        </Typography>
+                        <br />
                         <form className={classes.form} onSubmit={handleSubmit}>
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="event-name"
-                                label="Name"
-                                name="Name"
-                                autoFocus
-                                onChange={(e) => setName(e.target.value)}
-                            />
-                            <TextField
-                                variant="outlined"
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="Guest Email"
-                                label="Guest Email"
-                                id="email"
-                                autoComplete="email"
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+                            <Typography component="h3" variant="h6">
+                                Where are you coming from?
+                            </Typography>
                             {AutoCompletePlaces}
                             <FormControlLabel
                                 control={
@@ -130,7 +122,7 @@ function GuestForm() {
                             <Collapse in={checked}>
                                 <TextField
                                     id="standard-number"
-                                    label="Number"
+                                    label="Number of Seats Available"
                                     type="number"
                                     fullWidth
                                     onChange={(e) => setSeats(e.target.value)}
