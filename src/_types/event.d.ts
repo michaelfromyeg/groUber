@@ -1,9 +1,16 @@
 import { People } from './people'
 
 export interface Event {
-  _id: string;
-  name?: string;
+  _id?: string;
+  name: string;
+  organizerEmail: string;
   people: People[];
-  destination: string;
+  destination: {
+    address: string;
+    latlng: {
+      lat: double,
+      lng: double,
+    }
+  };
   path?: any; // TODO:
 }

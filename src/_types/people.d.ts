@@ -1,10 +1,17 @@
 import { Address } from './address'
 
 export interface People {
-  name: string,
+  name: string;
+  email: string;
   canDrive: boolean;
   seats: number;
-  address: Address;
+  location: {
+    address: Address;
+    latlng: {
+      lat: double;
+      lng: double;
+    }
+  }
 }
 
 
