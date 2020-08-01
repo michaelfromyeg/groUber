@@ -16,6 +16,8 @@ import classes from '*.module.css';
 import BackIcon from '@material-ui/icons/ArrowBackIosRounded';
 import Map from '../components/Map';
 import ListView from '../components/ListView';
+import useEventPeople from 'src/hooks/useEventPeople';
+
 
 const useStyles = makeStyles((theme) => ({
   menuButton: {
@@ -35,7 +37,7 @@ const DashBoard = () => {
     lng: 0.0
   });
 
-  const [value, loading, error] = useDocument(
+  const [eventData, loading, error] = useDocument(
     firebase.firestore().collection('events').doc(eventId),
     {
       snapshotListenOptions: {
@@ -43,13 +45,14 @@ const DashBoard = () => {
       }
     }
   );
+  const people = useEventPeople(eventData);
 
-  if (!loading && !value?.data()) {
+  if (!loading && !eventData?.data()) {
     globalAny.setNotification('error', 'Event not found.');
     history.push('/');
   }
 
-  const event = value?.data();
+  const event = eventData?.data()  
 
   React.useEffect(() => {
     const showPosition = (position: any) => {
