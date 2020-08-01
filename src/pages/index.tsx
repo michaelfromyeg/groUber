@@ -23,7 +23,6 @@ const index = () => {
           <EventForm />
         </p>
       </header>
-      <EventForm />
     </div>
   )
 }
