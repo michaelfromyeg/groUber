@@ -9,7 +9,8 @@ import {
   IconButton,
   Typography,
   Button,
-  makeStyles
+  makeStyles,
+  Grid
 } from '@material-ui/core';
 import classes from '*.module.css';
 import BackIcon from '@material-ui/icons/ArrowBackIosRounded';
@@ -91,12 +92,13 @@ const DashBoard = () => {
           <Typography variant="h6">groUber</Typography>
         </Toolbar>
       </AppBar>
-      <div style={{ display: 'flex' }}>
+    
         {/* Load map */}
-        <Map center={coord} />
         {/* Load side-menu */}
-        <ListView />
-      </div>
+        <div style = {{display: "flex"}}>
+          <ListView />
+          <Map center={coord} />
+        </div>
     </>
   );
 };

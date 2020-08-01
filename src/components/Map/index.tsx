@@ -15,7 +15,7 @@ const MapContainer = ({
       zoom={13}
       styles={theme}
       initialCenter={center}
-      containerStyle={{ height: 'calc(100vh - 64px)' }}
+      containerStyle={{ height: 'calc(100vh - 64px)', width: '82.5vw' }}
     />
   );
 };
