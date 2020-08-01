@@ -20,6 +20,7 @@ import { Radio, Collapse, Divider } from '@material-ui/core';
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { Event } from '../_types/event';
 import 'firebase/auth';
+import { People } from 'src/_types/people';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -46,6 +47,7 @@ function GuestForm() {
     const history = useHistory();
     const db = firebase.firestore();
     const { eventId } = useParams();
+    const [host, setHost] = useState<People>(null);
 
     const [event, loading, error] = useDocument(firebase.firestore().collection('events').doc(eventId), {
         snapshotListenOptions: {
@@ -60,6 +62,10 @@ function GuestForm() {
     const [checked, setChecked] = React.useState(false);
 
     const eventData: Event = event?.data();
+    const eventHost = (eventData?.host as unknown) as firebase.firestore.DocumentReference;
+    eventHost?.get()?.then((host) => {
+        setHost(host.data() as People);
+    });
     const currentUser = firebase.auth().currentUser;
 
     async function handleSubmit(e: any) {
@@ -91,7 +97,7 @@ function GuestForm() {
                     <CssBaseline />
                     <div className={classes.paper}>
                         <Typography component="h1" variant="h5">
-                            {eventData?.organizerName} is inviting you to attend {eventData?.name}.
+                            {host?.name} is inviting you to attend {eventData?.name}.
                         </Typography>
                         <br />
                         <Typography component="h1" variant="h5">
