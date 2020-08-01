@@ -14,6 +14,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import * as firebase from 'firebase'
 import { useHistory } from 'react-router-dom'
+import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces'
+
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -43,6 +45,7 @@ function EventForm(){
 
   const [eventName, setName] = useState('')
   const [organizerName, setOrganizerName] = useState('')
+  const [address, latlng, AutoCompletePlaces] = useAutoCompletePlaces("Add the Destination Address");
   const [email, setEmail] = useState('')
 
 
@@ -60,7 +63,12 @@ function EventForm(){
             const eventRef = await db.collection('events').add({
               name: eventName,
               organizerName,
-              organizerEmail: email
+              organizerEmail: email,
+              people: [],
+              destination: {
+                latlng,
+                address
+              }
             })
             history.push(`/event/${eventRef.id}/dashboard`)
           }}
@@ -97,6 +105,7 @@ function EventForm(){
             autoComplete="email"
             onChange={e => setEmail(e.target.value)}
           />
+          {AutoCompletePlaces}
           <Button
             type="submit"
             fullWidth
