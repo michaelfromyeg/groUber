@@ -39,8 +39,6 @@ const DashBoard = () => {
   );
   const people = useEventPeople(eventId);
 
-  console.log(people)
-
   if (!loading && !value?.data()) {
     globalAny.setNotification('error', 'Event not found.')
     history.push('/')
