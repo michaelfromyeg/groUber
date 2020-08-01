@@ -27,11 +27,36 @@ const functions = __importStar(require("firebase-functions"));
 const haversine_1 = __importDefault(require("haversine"));
 // import { PriorityQueue, Node } from './PriorityQueue'
 const priorityqueue_1 = __importDefault(require("priorityqueue"));
+const firebase = __importStar(require("firebase"));
+require("firebase/firestore");
+const firebaseConfig = {
+    apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
+    authDomain: 'find-my-carpool.firebaseapp.com',
+    databaseURL: 'https://find-my-carpool.firebaseio.com',
+    projectId: 'find-my-carpool',
+    storageBucket: 'find-my-carpool.appspot.com',
+    messagingSenderId: '470237283855',
+    appId: '1:470237283855:web:d3aa289ca316787e4a457a',
+    measurementId: 'G-YSVSBWXT23',
+};
+firebase.initializeApp(firebaseConfig);
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
-exports.solve = functions.https.onRequest((request, response) => {
+exports.solve = functions.https.onRequest(async (request, response) => {
     functions.logger.info("Hello logs!", { structuredData: true });
-    response.json(solveCarpoolProblem(request.body.event));
+    // grab event first
+    let result = await firebase.firestore().collection("events").doc(request.query.eventId).get();
+    let event = result.data();
+    if (!event) {
+        response.json("error couldnt find event");
+        return;
+    }
+    let people = await Promise.all(event.people.map(async (person) => {
+        const personRef = await person.get();
+        return Object.assign({ id: person.id }, personRef.data());
+    }));
+    event.people = people;
+    response.json(solveCarpoolProblem(event));
 });
 /**
  * Solves the carpool problem. Given an event (containing a list of people)
@@ -87,8 +112,8 @@ function solveCarpoolProblem(event) {
         const nextPassengerNode = pq.dequeue();
         if (!nextPassengerNode)
             continue;
-        const nextPassenger = getPersonById(people, nextPassengerNode.value.passengerId);
-        const minDriver = getPersonById(people, nextPassengerNode.value.minDriverId);
+        const nextPassenger = getPersonById(people, nextPassengerNode.passengerId);
+        const minDriver = getPersonById(people, nextPassengerNode.minDriverId);
         if (!nextPassenger || !minDriver)
             continue;
         minDriver.location.latlng = {
@@ -117,7 +142,17 @@ function solveCarpoolProblem(event) {
             }
         }
     }
-    return solution;
+    console.log(solution);
+    return strMapToObj(solution);
+}
+function strMapToObj(strMap) {
+    let obj = Object.create(null);
+    for (let [k, v] of strMap) {
+        // We don’t escape the key '__proto__'
+        // which can cause problems on older engines
+        obj[k] = v;
+    }
+    return obj;
 }
 function getSomeoneDrivingNoOne(drivers, solution) {
     for (let driver of drivers) {
