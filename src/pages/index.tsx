@@ -1,7 +1,8 @@
 import React from 'react'
 import styles from '../styles/App.module.scss'
 import EventForm from '../components/EventForm'
-import GuestDetails from '../components/GuestDetails'
+import { Button } from '@material-ui/core'
+import firebase from 'firebase'
 
 const index = () => {
 
@@ -20,10 +21,18 @@ const index = () => {
         <img src={'/logo.png'} className={styles.logo} alt="logo" />
         <p>
           <code>Create carpools, without the headache.</code>
-          <EventForm />
         </p>
       </header>
       <EventForm />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          firebase.auth().signOut()
+        }}
+      >
+        Logout
+      </Button>
     </div>
   )
 }
