@@ -11,12 +11,15 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
+import Autocomplete from '@material-ui/lab/Autocomplete'
 import * as firebase from 'firebase'
 import { useHistory } from 'react-router-dom'
 import PlacesAutocomplete, {
   geocodeByAddress,
-  getLatLng
+  getLatLng,
+  Suggestion
 } from 'react-places-autocomplete'
+import { Radio, Collapse } from '@material-ui/core'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -48,6 +51,13 @@ function GuestForm () {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [address, setAddress] = useState('')
+  const [seats, setSeats] = useState('')
+
+  const [checked, setChecked] = React.useState(false)
+
+  // const handleChange = (event) => {
+  //   setChecked(event.target.checked);
+  // };
 
   function handleChange(address: string) {
     setAddress(address)
@@ -109,47 +119,71 @@ function GuestForm () {
             onChange={handleChange}
             onSelect={handleSelect}
           >
-            {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-              <div>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="location"
-                  label="Your Location"
-                  id="location"
-                  autoComplete="location"
-                  {...getInputProps({
-                    placeholder: 'Search Places ...',
-                    className: 'location-search-input'
-                  })}
-                />
-                <div className="autocomplete-dropdown-container">
-                  {loading && <div>Loading...</div>}
-                  {suggestions.map(suggestion => {
-                    const className = suggestion.active
-                      ? 'suggestion-item--active'
-                      : 'suggestion-item'
-                      // inline style for demonstration purpose
-                    const style = suggestion.active
-                      ? { backgroundColor: '#fafafa', cursor: 'pointer' }
-                      : { backgroundColor: '#ffffff', cursor: 'pointer' }
-                    return (
-                      <div
-                        {...getSuggestionItemProps(suggestion, {
-                          className,
-                          style
-                        })}
-                      >
-                        <span>{suggestion.description}</span>
-                      </div>
-                    )
-                  })}
+            {({ getInputProps, suggestions, getSuggestionItemProps, loading }) =>
+            {
+              // const options = suggestions.map((suggestion) => suggestion.description)
+              return (
+                <div>
+                  <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="location"
+                    label="Your Location"
+                    id="location"
+                    autoComplete="location"
+                    {...getInputProps({
+                      placeholder: 'Search Places ...',
+                      className: 'location-search-input'
+                    })}
+                  />
+                  <div className="autocomplete-dropdown-container">
+                    {loading && <div>Loading...</div>}
+                    {suggestions.map(suggestion => {
+                      const className = suggestion.active
+                        ? 'suggestion-item--active'
+                        : 'suggestion-item'
+                        // inline style for demonstration purpose
+                      const style = suggestion.active
+                        ? { backgroundColor: '#fafafa', cursor: 'pointer' }
+                        : { backgroundColor: '#ffffff', cursor: 'pointer' }
+                      return (
+                        <div
+                          {...getSuggestionItemProps(suggestion, {
+                            className,
+                            style
+                          })}
+                        >
+                          <span>{suggestion.description}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}}
           </PlacesAutocomplete>
+          <FormControlLabel
+            control={<Checkbox
+              checked={checked}
+              onChange = {() => {
+                setChecked(!checked)
+              }}
+              name="isDriver" />}
+            label="Are you Driving?"
+          />
+          <Collapse in={checked}>
+            <TextField
+              id="standard-number"
+              label="Number"
+              type="number"
+              fullWidth
+              onChange = {(e) => setSeats(e.target.value)}
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </Collapse>
           <Button
             type="submit"
             fullWidth
@@ -165,6 +199,20 @@ function GuestForm () {
       </Box>
     </Container>
   )
+}
+
+interface PlaceType {
+  description: string;
+  structured_formatting: {
+    main_text: string;
+    secondary_text: string;
+    main_text_matched_substrings: [
+      {
+        offset: number;
+        length: number;
+      },
+    ];
+  };
 }
 
 export default GuestForm

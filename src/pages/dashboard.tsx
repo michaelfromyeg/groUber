@@ -1,26 +1,36 @@
 import React, { useState } from 'react'
-import styles from '../styles/App.module.scss'
-import * as firebase from 'firebase'
+import * as firebase from 'firebase';
 import { Event } from '../_types/event'
-import { useParams, useHistory } from 'react-router-dom'
-import { useDocument } from 'react-firebase-hooks/firestore'
+import { useParams, useHistory } from 'react-router-dom';
+import { useDocument } from 'react-firebase-hooks/firestore';
+import { AppBar, Toolbar, IconButton, Typography, Button, makeStyles } from '@material-ui/core'
+import classes from '*.module.css'
+import BackIcon from '@material-ui/icons/ArrowBackIosRounded'
+import Map from '../components/Map'
+
+const useStyles = makeStyles((theme) => ({
+  menuButton: {
+    marginRight: theme.spacing(2)
+  }
+}))
 
 //eslint-disable-next-line
 const globalAny: any = global
-
+// some shit
 const DashBoard = () => {
 
-  const { eventId } = useParams()
-  const history = useHistory()
+  const classes = useStyles()
+  const { eventId } = useParams();
+  const history = useHistory();
 
   const [value, loading, error] = useDocument(
-    firebase.firestore().collection('events').doc(eventId),
+    firebase.firestore().collection("events").doc(eventId),
     {
       snapshotListenOptions: {
         includeMetadataChanges: true
       }
     }
-  )
+  );
 
   if (!loading && !value?.data()) {
     globalAny.setNotification('error', 'Event not found.')
@@ -28,15 +38,32 @@ const DashBoard = () => {
   }
 
   const event = value?.data()
-
+  
   return (
-    <div className={styles.app}>
-      <header className={styles.header}>
-        <img src={'/logo.png'} className={styles.logo} alt="logo" />
-        <p>{event?.name}</p>
-      </header>
-    </div>
-  )
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            edge="start"
+            className={classes.menuButton}
+            color="inherit"
+            aria-label="menu"
+            onClick={() => {
+              history.push('/')
+            }}
+          >
+            <BackIcon />
+          </IconButton>
+          <Typography variant="h6">
+            groUber
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+        
+
+    </>
+  );
 }
 
-export default DashBoard
+export default DashBoard;
