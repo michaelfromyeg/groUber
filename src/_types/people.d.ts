@@ -4,6 +4,8 @@ export interface People {
     id: string;
     name: string;
     email: string;
+    profilePicture: string;
+    userId: string;
     canDrive: boolean;
     seats: number;
     location: {

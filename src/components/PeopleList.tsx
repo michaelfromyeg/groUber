@@ -177,7 +177,7 @@ export default function ListView(props: any) {
     const y = window.innerHeight * 0.8;
     return (
         <div style={{ textAlign: 'center' }}>
-            <List className={classes.root} style={{ height: String(y) + 'px', overflow: 'auto' }}>
+            <List className={classes.root} style={{ maxHeight: String(y) + 'px', overflow: 'auto' }}>
                 {props.members.map((person: any) => (
                     <Person
                         key={person.name}
