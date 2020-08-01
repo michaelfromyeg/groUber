@@ -4,19 +4,21 @@ import { useState, useEffect } from 'react';
 
 export default function useEventPeople(eventData: firebase.firestore.DocumentData): any[] {
     const [people, setPeople] = useState([]);
-    let data: any = eventData?.data();
+    const data: any = eventData?.data();
+
     useEffect(() => {
-        if (data)
+        if (data) {
+            data.people.push(data.host);
             Promise.all(
                 data.people.map(async (person: firebase.firestore.DocumentReference) => {
                     const personRef = await person.get();
                     return personRef.data();
                 }),
             ).then((result) => {
-                console.log(result)
-                return setPeople(result)
+                setPeople(result);
             });
+        }
     }, [eventData]);
-    
-    return people
+
+    return people;
 }

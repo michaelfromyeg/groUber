@@ -7,6 +7,7 @@ export interface People {
     userId: string;
     canDrive: boolean;
     seats: number;
+    isHost?: boolean;
     location: {
         address: Address;
         latlng: {
