@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-function GuestForm (){
+function GuestForm () {
   const classes = useStyles()
   const history = useHistory()
   const db = firebase.firestore()
@@ -161,7 +161,7 @@ function GuestForm (){
           </Button>
         </form>
       </div>
-        <Box mt={8}>
+      <Box mt={8}>
       </Box>
     </Container>
   )

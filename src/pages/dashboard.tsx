@@ -33,9 +33,7 @@ const DashBoard = () => {
     <div className={styles.app}>
       <header className={styles.header}>
         <img src={'/logo.png'} className={styles.logo} alt="logo" />
-        <p>
-          <code>{event?.name}</code>
-        </p>
+        <p>{event?.name}</p>
       </header>
     </div>
   )
