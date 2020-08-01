@@ -17,6 +17,8 @@
     "@types/node": "^14.0.27",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.1",
+    "haversine": "^1.1.1",
+    "priorityqueue": "^1.0.0",
     "tslint": "^5.20.1",
     "typescript": "^3.8.0"
   },

@@ -1,6 +1,7 @@
 import { Address } from './address';
 
 export interface People {
+    id: string;
     name: string;
     email: string;
     profilePicture: string;
