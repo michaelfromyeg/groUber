@@ -7,6 +7,10 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
+import {
+  geocodeByAddress,
+  getLatLng,
+} from 'react-places-autocomplete';
 
 function loadScript(src: string, position: HTMLElement | null, id: string) {
   if (!position) {
@@ -43,10 +47,11 @@ interface PlaceType {
   };
 }
 
-export default function useAutocompletePlaces() {
+export default function useAutocompletePlaces(locationType : string) {
   const classes = useStyles();
   const [value, setValue] = React.useState<PlaceType | null>(null);
   const [inputValue, setInputValue] = React.useState('');
+  const [latLng, setLatLng] = React.useState({});
   const [options, setOptions] = React.useState<PlaceType[]>([]);
   const loaded = React.useRef(false);
 
@@ -108,15 +113,20 @@ export default function useAutocompletePlaces() {
       includeInputInList
       filterSelectedOptions
       value={value}
-      onChange={(event: any, newValue: any) => {
+      onChange={async (event: any, newValue: any) => {
         setOptions(newValue ? [newValue, ...options] : options);
         setValue(newValue);
+        const address = typeof newValue === 'string' ? newValue : (newValue as PlaceType).description
+
+        const results = await geocodeByAddress(address);
+        const latlng = await getLatLng(results[0]);
+        setLatLng(latlng);
       }}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue);
       }}
       renderInput={(params) => (
-        <TextField margin="normal" {...params} label="Add Your Location" variant="outlined" fullWidth />
+        <TextField required margin="normal" {...params} label= {locationType} variant="outlined" fullWidth />
       )}
       renderOption={(option) => {
         const matches = option.structured_formatting.main_text_matched_substrings;
@@ -146,5 +156,11 @@ export default function useAutocompletePlaces() {
     />
   );
 
-  return [typeof inputValue === 'string' ? inputValue : (inputValue as PlaceType).description, render];
+  const address = typeof inputValue === 'string' ? inputValue : (inputValue as PlaceType).description;
+
+  return [
+    address,
+    latLng,
+    render,
+  ];
 }
