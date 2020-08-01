@@ -1,4 +1,4 @@
-import { People } from './people'
+import { People } from './people';
 
 export interface Event {
   _id?: string;
@@ -8,9 +8,9 @@ export interface Event {
   destination: {
     address: string;
     latlng: {
-      lat: double,
-      lng: double,
-    }
+      lat: double;
+      lng: double;
+    };
   };
   path?: any; // TODO:
 }
