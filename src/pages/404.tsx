@@ -8,11 +8,9 @@ const index = () => {
       <header className={styles.header}>
         <img src={'/logo.png'} className={styles.logo} alt="logo" />
         <p>
-          <code>
             Page not found. Sorry :(
             <br />
-            Click here to go back: <Link to="/">home</Link>.
-          </code>
+            Click here to go back <Link to="/">home</Link>.
         </p>
       </header>
     </div>
