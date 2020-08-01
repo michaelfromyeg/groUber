@@ -1,6 +1,6 @@
 import React, { useState, ReactElement } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import Index from './pages/index';
+import Index from './pages/Home';
 import Dashboard from './pages/dashboard';
 import Form from './pages/form';
 import Notification from './components/Notification';
@@ -47,7 +47,7 @@ function PublicRoute({ component: Component, onUserLogin, ...rest }: any) {
 const App = (): ReactElement => {
     const [user, setUser] = useState(firebase.auth().currentUser);
     firebase.auth().onAuthStateChanged(setUser);
-
+    console.log('app.tsx')
     return (
         <ThemeProvider theme={theme}>
             <Router>

@@ -2,11 +2,9 @@ import { useDocument } from 'react-firebase-hooks/firestore';
 import firebase from 'firebase';
 import { useState, useEffect } from 'react';
 
-export default function useEventPeople(eventData: firebase.firestore.DocumentData) {
+export default function useEventPeople(eventData: firebase.firestore.DocumentData): any[] {
     const [people, setPeople] = useState([]);
-
-    const data = eventData?.data();
-
+    let data: any = eventData?.data();
     useEffect(() => {
         if (data)
             Promise.all(
@@ -14,8 +12,11 @@ export default function useEventPeople(eventData: firebase.firestore.DocumentDat
                     const personRef = await person.get();
                     return personRef.data();
                 }),
-            ).then((result) => setPeople(result));
-    }, [data, eventData]);
-
-    return people;
+            ).then((result) => {
+                console.log(result)
+                return setPeople(result)
+            });
+    }, [eventData]);
+    
+    return people
 }
