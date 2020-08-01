@@ -7,6 +7,7 @@ import { AppBar, Toolbar, IconButton, Typography, Button, makeStyles } from '@ma
 import classes from '*.module.css'
 import BackIcon from '@material-ui/icons/ArrowBackIosRounded'
 import Map from '../components/Map'
+import ListView from '../components/ListView'
 
 const useStyles = makeStyles((theme) => ({
   menuButton: {
@@ -82,10 +83,13 @@ const DashBoard = () => {
           <Typography variant="h6">groUber</Typography>
         </Toolbar>
       </AppBar>
+      {/* Load map */}
       <Map
         center={coord}
         zoom={13}
       />
+      {/* Load side-menu */}
+      <ListView />
     </>
   );
 }
