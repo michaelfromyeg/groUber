@@ -1,6 +1,6 @@
-import React from 'react'
-import styles from '../styles/App.module.scss'
-import LoginForm from '../components/LoginForm'
+import React from 'react';
+import styles from '../styles/App.module.scss';
+import LoginForm from '../components/LoginForm';
 
 const index = () => {
   return (
@@ -13,8 +13,7 @@ const index = () => {
       </header>
       <LoginForm />
     </div>
-  )
-}
+  );
+};
 
-export default index
-
+export default index;

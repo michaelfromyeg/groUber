@@ -1,4 +1,4 @@
-import { Address } from './address'
+import { Address } from './address';
 
 export interface People {
   name: string;
@@ -10,8 +10,6 @@ export interface People {
     latlng: {
       lat: double;
       lng: double;
-    }
-  }
+    };
+  };
 }
-
-

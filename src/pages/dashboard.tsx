@@ -65,6 +65,7 @@ const DashBoard = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(showPosition);
     } else {
+      // eslint-disable-next-line @typescript-eslint/quotes
       alert("your browser doesn't support maps");
     }
   }, []);
