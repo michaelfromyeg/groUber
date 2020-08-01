@@ -15,7 +15,7 @@ function PrivateRoute({component: Component, ...rest}: any) {
   return (
       <Route
           {...rest}
-          render={props => firebase.auth().currentUser ? (<Component {...props} />) : (<Redirect to="/login" />)}
+          render={props => firebase.auth().currentUser ? (<Component {...props} />) : (<Redirect to={{ pathname: '/', state: { from: props.location } }} />)}
       />
   )
 }

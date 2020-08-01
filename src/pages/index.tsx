@@ -20,8 +20,7 @@ const index = () => {
       <header className={styles.header}>
         <img src={'/logo.png'} className={styles.logo} alt="logo" />
         <p>
-          Create carpools, without the headache.
-          <EventForm />
+          <code>Create carpools, without the headache.</code>
         </p>
       </header>
       <EventForm />
