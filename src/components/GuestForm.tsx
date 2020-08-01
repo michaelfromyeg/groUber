@@ -9,14 +9,17 @@ import Grid from '@material-ui/core/Grid'
 import Box from '@material-ui/core/Box'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
+import Autocomplete from '@material-ui/lab/Autocomplete'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import * as firebase from 'firebase'
 import { useHistory } from 'react-router-dom'
 import PlacesAutocomplete, {
   geocodeByAddress,
-  getLatLng
+  getLatLng,
+  Suggestion
 } from 'react-places-autocomplete'
+import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -39,7 +42,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-
 function GuestForm () {
   const classes = useStyles()
   const history = useHistory()
@@ -47,21 +49,7 @@ function GuestForm () {
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [address, setAddress] = useState('')
-
-  function handleChange(address: string) {
-    setAddress(address)
-  }
-
-  function handleSelect(address: string) {
-    setAddress(address)
-    geocodeByAddress(address)
-      .then(results => {
-        getLatLng(results[0])
-      })
-      .then(latLng => console.log('Success', latLng))
-      .catch(error => console.error('Error', error))
-  }
+  const [address, AutoCompletePlaces] = useAutoCompletePlaces();
 
   return (
     <Container component="main" maxWidth="xs">
@@ -104,52 +92,7 @@ function GuestForm () {
             autoComplete="email"
             onChange={e => setEmail(e.target.value)}
           />
-          <PlacesAutocomplete
-            value={address}
-            onChange={handleChange}
-            onSelect={handleSelect}
-          >
-            {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-              <div>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="location"
-                  label="Your Location"
-                  id="location"
-                  autoComplete="location"
-                  {...getInputProps({
-                    placeholder: 'Search Places ...',
-                    className: 'location-search-input'
-                  })}
-                />
-                <div className="autocomplete-dropdown-container">
-                  {loading && <div>Loading...</div>}
-                  {suggestions.map(suggestion => {
-                    const className = suggestion.active
-                      ? 'suggestion-item--active'
-                      : 'suggestion-item'
-                      // inline style for demonstration purpose
-                    const style = suggestion.active
-                      ? { backgroundColor: '#fafafa', cursor: 'pointer' }
-                      : { backgroundColor: '#ffffff', cursor: 'pointer' }
-                    return (
-                      <div
-                        {...getSuggestionItemProps(suggestion, {
-                          className,
-                          style
-                        })}
-                      >
-                        <span>{suggestion.description}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-          </PlacesAutocomplete>
+          {AutoCompletePlaces}
           <Button
             type="submit"
             fullWidth
