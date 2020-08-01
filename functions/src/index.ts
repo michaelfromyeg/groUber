@@ -57,16 +57,13 @@ function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
       closestDriverToPassengers.set(passenger.id, [minDriverId, minDriverDistance]);
     }
 
-
-    let pq = new PriorityQueue();
-
-
-    // this may be fucked
     const numericCompare = (a:number, b:number) => (a > b ? 1 : a < b ? -1 : 0);
 
     const comparator = (a: any, b: any) => {
       return numericCompare(a.minDriverDistance, b.minDriverDistance);
     };
+
+    let pq = new PriorityQueue({comparator});
 
     for(let passenger of remainingPassengers) {
       const array = closestDriverToPassengers.get(passenger.id);
