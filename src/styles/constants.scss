@@ -1,9 +1,46 @@
 // Colors
 // white, black
+$white: #FFFFFF;
+$off-white: #DEDEDE;
 $dark-gray: #202020;
-$red: #ff354c;
-$blue: #1177aa;
+$black: #000000;
+
+$blue: #276EF1;
+$green: #05A357;
+$yellow: #FFC043;
+$red: #E11900;
+$brown: #99644C;
+$orange: #FF6937;
+$purple: #7356BF;
 
 // Fonts
 $primary-font: 'Poppins', sans-serif;
 $secondary-font: 'PT Serif', serif;
+
+// Add SCSS variables to body
+$prefix: "--";
+
+@function custom-property-name($name) {
+    @return $prefix + $name;
+}
+
+@mixin define-custom-property($name, $value) {
+    #{custom-property-name($name)}: $value;
+}
+
+body {
+    @include define-custom-property('white', $white);
+    @include define-custom-property('off-white', $off-white);
+    @include define-custom-property('dark-gray', $dark-gray);
+    @include define-custom-property('black', $black);
+    @include define-custom-property('blue', $blue);
+    @include define-custom-property('green', $green);
+    @include define-custom-property('yellow', $yellow);
+    @include define-custom-property('red', $red);
+    @include define-custom-property('brown', $brown);
+    @include define-custom-property('orange', $orange);
+    @include define-custom-property('purple', $purple);
+    @include define-custom-property('primary-font', $primary-font);
+    @include define-custom-property('secondary-font', $secondary-font);
+       
+}

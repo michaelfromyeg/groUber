@@ -1,21 +1,20 @@
-import React, { useState } from 'react'
-import Avatar from '@material-ui/core/Avatar'
-import Button from '@material-ui/core/Button'
-import CssBaseline from '@material-ui/core/CssBaseline'
-import TextField from '@material-ui/core/TextField'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import Checkbox from '@material-ui/core/Checkbox'
-import Link from '@material-ui/core/Link'
-import Grid from '@material-ui/core/Grid'
-import Box from '@material-ui/core/Box'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
-import Typography from '@material-ui/core/Typography'
-import { makeStyles } from '@material-ui/core/styles'
-import Container from '@material-ui/core/Container'
-import * as firebase from 'firebase'
-import { useHistory } from 'react-router-dom'
-import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces'
-
+import React, { useState } from 'react';
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import Link from '@material-ui/core/Link';
+import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import * as firebase from 'firebase';
+import { useHistory } from 'react-router-dom';
+import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -35,21 +34,21 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2)
   }
-}))
+}));
 
+function EventForm() {
+  const classes = useStyles();
+  const history = useHistory();
+  const db = firebase.firestore();
 
-function EventForm(){
-  const classes = useStyles()
-  const history = useHistory()
-  const db = firebase.firestore()
+  const [eventName, setName] = useState('');
+  const [organizerName, setOrganizerName] = useState('');
+  const [address, latlng, AutoCompletePlaces] = useAutoCompletePlaces(
+    'Add the Destination Address'
+  );
+  const [email, setEmail] = useState('');
 
-  const [eventName, setName] = useState('')
-  const [organizerName, setOrganizerName] = useState('')
-  const [address, latlng, AutoCompletePlaces] = useAutoCompletePlaces("Add the Destination Address");
-  const [email, setEmail] = useState('')
-
-
-  return(
+  return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
@@ -59,7 +58,7 @@ function EventForm(){
         <form
           className={classes.form}
           onSubmit={async (e) => {
-            e.preventDefault()
+            e.preventDefault();
             const eventRef = await db.collection('events').add({
               name: eventName,
               organizerName,
@@ -69,8 +68,8 @@ function EventForm(){
                 latlng,
                 address
               }
-            })
-            history.push(`/event/${eventRef.id}/dashboard`)
+            });
+            history.push(`/event/${eventRef.id}/dashboard`);
           }}
         >
           <TextField
@@ -82,7 +81,7 @@ function EventForm(){
             label="Event Name"
             name="Event Name"
             autoFocus
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
           />
           <TextField
             variant="outlined"
@@ -92,7 +91,7 @@ function EventForm(){
             name="Organizer Name"
             label="Organizer Name"
             id="Address"
-            onChange={e => setOrganizerName(e.target.value)}
+            onChange={(e) => setOrganizerName(e.target.value)}
           />
           <TextField
             variant="outlined"
@@ -103,7 +102,7 @@ function EventForm(){
             label="Organizer Email"
             id="email"
             autoComplete="email"
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
           {AutoCompletePlaces}
           <Button
@@ -117,10 +116,9 @@ function EventForm(){
           </Button>
         </form>
       </div>
-      <Box mt={8}>
-      </Box>
+      <Box mt={8}></Box>
     </Container>
-  )
+  );
 }
 
-export default EventForm
+export default EventForm;
