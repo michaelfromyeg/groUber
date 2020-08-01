@@ -2,18 +2,10 @@ import { useDocument } from "react-firebase-hooks/firestore";
 import firebase from "firebase";
 import { useState, useEffect } from "react";
 
-export default function useEventPeople(eventId: string) {
+export default function useEventPeople(eventData: firebase.firestore.DocumentData) {
   const [people, setPeople] = useState([]);
-  const [value, loading, error] = useDocument(
-    firebase.firestore().collection("events").doc(eventId),
-    {
-      snapshotListenOptions: {
-        includeMetadataChanges: true
-      }
-    }
-  );
 
-  const data = value?.data();
+  const data = eventData?.data();
   
   useEffect(() => {
     if(data)
@@ -24,7 +16,7 @@ export default function useEventPeople(eventId: string) {
     .then(result =>
       setPeople(result)
     )
-  }, [value])
+  }, [eventData])
 
   return people;
 }

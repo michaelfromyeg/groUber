@@ -36,7 +36,7 @@ const DashBoard = () => {
     lng: 0.0
   });
 
-  const [value, loading, error] = useDocument(
+  const [eventData, loading, error] = useDocument(
     firebase.firestore().collection('events').doc(eventId),
     {
       snapshotListenOptions: {
@@ -44,14 +44,14 @@ const DashBoard = () => {
       }
     }
   );
-  const people = useEventPeople(eventId);
+  const people = useEventPeople(eventData);
 
-  if (!loading && !value?.data()) {
+  if (!loading && !eventData?.data()) {
     globalAny.setNotification('error', 'Event not found.');
     history.push('/');
   }
 
-  const event = value?.data()  
+  const event = eventData?.data()  
 
   React.useEffect(() => {
     const showPosition = (position: any) => {
