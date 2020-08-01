@@ -1,6 +1,10 @@
 import * as functions from 'firebase-functions';
-import {Event} from '../../src/_types/event';
-import { People } from '../../src/_types/people';
+import { Event } from '../../src/_types/event'
+import { People } from '../../src/_types/people'
+
+const { priorityQueue } = require('./priorityQueue')
+
+
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript

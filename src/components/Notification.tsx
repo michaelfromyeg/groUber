@@ -6,37 +6,37 @@ import MuiAlert, { Color } from '@material-ui/lab/Alert';
 const globalAny: any = global
 
 const Notification = (): ReactElement => {
-  const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
-  const [message, setMessage] = useState('');
+    const [message, setMessage] = useState('');
 
-  const [type, setType] = useState<Color>('info');
+    const [type, setType] = useState<Color>('info');
 
-  globalAny.setNotification = (type: Color, message: string): void => {
-    setOpen(true);
-    setMessage(message);
-    setType(type);
-  };
+    globalAny.setNotification = (type: Color, message: string): void => {
+        setOpen(true);
+        setMessage(message);
+        setType(type);
+    };
 
-  return (
-    <Snackbar
-      id={'notification'}
-      open={open}
-      onClose={(): void => {
-        setOpen(false);
-        setMessage('');
-        setType('info');
-      }}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'left'
-      }}
-    >
-      <MuiAlert elevation={6} variant={'filled'} severity={type}>
-        {message}
-      </MuiAlert>
-    </Snackbar>
-  );
+    return (
+        <Snackbar
+            id={'notification'}
+            open={open}
+            onClose={(): void => {
+                setOpen(false);
+                setMessage('');
+                setType('info');
+            }}
+            anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+            }}
+        >
+            <MuiAlert elevation={6} variant={'filled'} severity={type}>
+                {message}
+            </MuiAlert>
+        </Snackbar>
+    );
 };
 
 export default Notification;
