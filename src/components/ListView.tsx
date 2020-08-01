@@ -179,23 +179,24 @@ const Person = (props: any) => {
   );
 };
 
-export default function ListView() {
+export default function ListView(props: any) {
   const classes = useStyles();
   const y = window.innerHeight * 0.8
   return (
-      <div>
+      <div style = {{textAlign: "center"}}>
         <List className={classes.root} style={{height: String(y) + "px", overflow: 'auto'}}>
-        {DUMMY_DATA.map((person) => (
+        {props.members.map((person: any) => (
             <Person
             key={person.name}
             seats={person.seats}
             name={person.name}
-            address={person.destination.address}
+            address={person.location.address}
             />
         ))}
+        {props.members.length === 0 && <h2 style = {{marginLeft: "37px", marginRight: "37px"}}> No members yet </h2>}
         </List>
         <br></br>
-        <Button variant="contained" color="secondary" style = {{margin: "auto"}}>
+        <Button variant="contained" color="secondary">
             Find optimal route
         </Button>
      </div>
