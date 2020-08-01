@@ -9,9 +9,9 @@ import Grid from '@material-ui/core/Grid'
 import Box from '@material-ui/core/Box'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
-import Autocomplete from '@material-ui/lab/Autocomplete'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
+import Autocomplete from '@material-ui/lab/Autocomplete'
 import * as firebase from 'firebase'
 import { useHistory } from 'react-router-dom'
 import PlacesAutocomplete, {
@@ -20,6 +20,7 @@ import PlacesAutocomplete, {
   Suggestion
 } from 'react-places-autocomplete'
 import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces'
+import { Radio, Collapse } from '@material-ui/core'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,6 +51,9 @@ function GuestForm () {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [address, AutoCompletePlaces] = useAutoCompletePlaces();
+  const [seats, setSeats] = useState('')
+
+  const [checked, setChecked] = React.useState(false)
 
   return (
     <Container component="main" maxWidth="xs">
@@ -93,6 +97,27 @@ function GuestForm () {
             onChange={e => setEmail(e.target.value)}
           />
           {AutoCompletePlaces}
+          <FormControlLabel
+            control={<Checkbox
+              checked={checked}
+              onChange = {() => {
+                setChecked(!checked)
+              }}
+              name="isDriver" />}
+            label="Are you Driving?"
+          />
+          <Collapse in={checked}>
+            <TextField
+              id="standard-number"
+              label="Number"
+              type="number"
+              fullWidth
+              onChange = {(e) => setSeats(e.target.value)}
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </Collapse>
           <Button
             type="submit"
             fullWidth
@@ -108,6 +133,20 @@ function GuestForm () {
       </Box>
     </Container>
   )
+}
+
+interface PlaceType {
+  description: string;
+  structured_formatting: {
+    main_text: string;
+    secondary_text: string;
+    main_text_matched_substrings: [
+      {
+        offset: number;
+        length: number;
+      },
+    ];
+  };
 }
 
 export default GuestForm
