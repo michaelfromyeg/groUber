@@ -18,10 +18,10 @@ const index = () => {
       <header className={styles.header}>
         <img src={'/logo.png'} className={styles.logo} alt="logo" />
         <p>
-          <code>Create carpools, without the headache.</code>
-          <EventForm />
+          Create carpools, without the headache.
         </p>
       </header>
+      <EventForm />
     </div>
   )
 }
