@@ -1,4 +1,4 @@
-import { createMuiTheme } from '@material-ui/core'
+import { createMuiTheme } from '@material-ui/core';
 import { readProperty } from '../utils/sassHelper';
 
 export default createMuiTheme({
@@ -11,8 +11,6 @@ export default createMuiTheme({
     success: { main: readProperty('green') }
   },
   typography: {
-    fontFamily: [
-      readProperty('primary-font')
-    ].join(','),
-  },
-})
+    fontFamily: [readProperty('primary-font')].join(',')
+  }
+});
