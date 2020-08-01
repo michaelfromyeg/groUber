@@ -15,7 +15,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as firebase from 'firebase';
 import { useHistory, useParams } from 'react-router-dom';
 import PlacesAutocomplete, { geocodeByAddress, getLatLng, Suggestion } from 'react-places-autocomplete';
-import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces';
+import useAutoCompletePlaces from '../hooks/useAutocompletePlaces';
 import { Radio, Collapse } from '@material-ui/core';
 import { useDocument } from 'react-firebase-hooks/firestore';
 

@@ -14,7 +14,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import * as firebase from 'firebase';
 import { useHistory } from 'react-router-dom';
-import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces';
+import useAutoCompletePlaces from '../hooks/useAutocompletePlaces';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -57,8 +57,10 @@ function EventForm() {
                     className={classes.form}
                     onSubmit={async (e) => {
                         e.preventDefault();
+                        const organizerUid = firebase.auth().currentUser.uid;
                         const eventRef = await db.collection('events').add({
                             name: eventName,
+                            organizerUid,
                             organizerName,
                             organizerEmail: email,
                             people: [],
