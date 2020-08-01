@@ -33,7 +33,9 @@ const DashBoard = () => {
             includeMetadataChanges: true,
         },
     });
+
     const people = useEventPeople(eventData);
+    console.log(people)
 
     if (!loading && !eventData?.data()) {
         globalAny.setNotification('error', 'Event not found.');
@@ -85,7 +87,7 @@ const DashBoard = () => {
             {/* Load side-menu */}
             <div style={{ display: 'flex' }}>
                 <ListView members={people} />
-                <Map center={coord} />
+                <Map center={coord}/>
             </div>
         </>
     );
