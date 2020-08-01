@@ -13,14 +13,15 @@ import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import * as firebase from 'firebase'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,
   Suggestion
 } from 'react-places-autocomplete'
+import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces'
 import { Radio, Collapse } from '@material-ui/core'
-
+import { useDocument } from 'react-firebase-hooks/firestore'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -42,38 +43,51 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-
 function GuestForm () {
   const classes = useStyles()
   const history = useHistory()
   const db = firebase.firestore()
+  const { eventId } = useParams();
+
+  const [event, loading, error] = useDocument(
+    firebase.firestore().collection("events").doc(eventId),
+    {
+      snapshotListenOptions: {
+        includeMetadataChanges: true
+      }
+    }
+  );
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [address, setAddress] = useState('')
-  const [seats, setSeats] = useState('')
+  const [address, latlng, AutoCompletePlaces] = useAutoCompletePlaces('Add Your Location');
+  const [seats, setSeats] = useState('0')
+  const [submitted, setSubmit] = useState<boolean>(false)
 
   const [checked, setChecked] = React.useState(false)
+    
+  async function handleSubmit(e: any) {
+    e.preventDefault()
+    let result = await db.collection('people').add({
+      name,
+      address,
+      email,
+      seats: checked ? Number(seats) : 0,
+      event: event.ref,
+    })
 
-  // const handleChange = (event) => {
-  //   setChecked(event.target.checked);
-  // };
+    console.log(result);
 
-  function handleChange(address: string) {
-    setAddress(address)
-  }
+    await event.ref.update({
+      people: firebase.firestore.FieldValue.arrayUnion(result)
+    });
 
-  function handleSelect(address: string) {
-    setAddress(address)
-    geocodeByAddress(address)
-      .then(results => {
-        getLatLng(results[0])
-      })
-      .then(latLng => console.log('Success', latLng))
-      .catch(error => console.error('Error', error))
+    setSubmit(true);
   }
 
   return (
+    <>
+    {!submitted ? 
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
@@ -82,15 +96,7 @@ function GuestForm () {
         </Typography>
         <form
           className={classes.form}
-          onSubmit={async (e) => {
-            e.preventDefault()
-            // const eventRef = await db.collection('events').add({
-            //   name: name,
-            //   name,
-            //   organizerEmail: email
-            // })
-            // history.push(`/event/${eventRef.id}/organizer`)
-          }}
+          onSubmit={handleSubmit}
         >
           <TextField
             variant="outlined"
@@ -114,55 +120,7 @@ function GuestForm () {
             autoComplete="email"
             onChange={e => setEmail(e.target.value)}
           />
-          <PlacesAutocomplete
-            value={address}
-            onChange={handleChange}
-            onSelect={handleSelect}
-          >
-            {({ getInputProps, suggestions, getSuggestionItemProps, loading }) =>
-            {
-              // const options = suggestions.map((suggestion) => suggestion.description)
-              return (
-                <div>
-                  <TextField
-                    variant="outlined"
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="location"
-                    label="Your Location"
-                    id="location"
-                    autoComplete="location"
-                    {...getInputProps({
-                      placeholder: 'Search Places ...',
-                      className: 'location-search-input'
-                    })}
-                  />
-                  <div className="autocomplete-dropdown-container">
-                    {loading && <div>Loading...</div>}
-                    {suggestions.map(suggestion => {
-                      const className = suggestion.active
-                        ? 'suggestion-item--active'
-                        : 'suggestion-item'
-                        // inline style for demonstration purpose
-                      const style = suggestion.active
-                        ? { backgroundColor: '#fafafa', cursor: 'pointer' }
-                        : { backgroundColor: '#ffffff', cursor: 'pointer' }
-                      return (
-                        <div
-                          {...getSuggestionItemProps(suggestion, {
-                            className,
-                            style
-                          })}
-                        >
-                          <span>{suggestion.description}</span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}}
-          </PlacesAutocomplete>
+          {AutoCompletePlaces}
           <FormControlLabel
             control={<Checkbox
               checked={checked}
@@ -197,8 +155,10 @@ function GuestForm () {
       </div>
       <Box mt={8}>
       </Box>
-    </Container>
-  )
+    </Container> : <code>Form Submitted!</code>
+    }
+    </>
+    )
 }
 
 interface PlaceType {
