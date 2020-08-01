@@ -18,7 +18,6 @@ const Form = () => {
       <header className={styles.header}>
         <img src={'/logo.png'} className={styles.logo} alt="logo" />
         <p>
-          Sign-up to attend!
           <GuestForm />
         </p>
       </header>
