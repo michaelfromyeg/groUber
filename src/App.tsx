@@ -1,6 +1,6 @@
 import React, { useState, ReactElement } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import Index from './pages/index';
+import Index from './pages/Home';
 import Dashboard from './pages/dashboard';
 import Form from './pages/form';
 import Notification from './components/Notification';
