@@ -1,9 +1,8 @@
-import React from 'react'
-import styles from '../styles/App.module.scss'
-import GuestForm from '../components/GuestForm'
+import React from 'react';
+import styles from '../styles/App.module.scss';
+import GuestForm from '../components/GuestForm';
 
 const Form = () => {
-
   // const getFunction = async () => {
   //   const eventSnapshot = await db.collection("events").get()
   //   eventSnapshot.forEach((doc) => {
@@ -22,8 +21,7 @@ const Form = () => {
         </p>
       </header>
     </div>
-  )
-}
+  );
+};
 
-export default Form
-
+export default Form;
