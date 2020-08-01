@@ -96,7 +96,7 @@ const DashBoard = () => {
         {/* Load map */}
         {/* Load side-menu */}
         <div style = {{display: "flex"}}>
-          <ListView />
+          <ListView members = {people}/>
           <Map center={coord} />
         </div>
     </>
