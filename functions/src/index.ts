@@ -5,15 +5,51 @@ import haversine from 'haversine';
 
 // import { PriorityQueue, Node } from './PriorityQueue'
 import PriorityQueue from 'priorityqueue';
+import * as firebase from 'firebase';
+import 'firebase/firestore';
 
+const firebaseConfig = {
+    apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
+    authDomain: 'find-my-carpool.firebaseapp.com',
+    databaseURL: 'https://find-my-carpool.firebaseio.com',
+    projectId: 'find-my-carpool',
+    storageBucket: 'find-my-carpool.appspot.com',
+    messagingSenderId: '470237283855',
+    appId: '1:470237283855:web:d3aa289ca316787e4a457a',
+    measurementId: 'G-YSVSBWXT23',
+};
+firebase.initializeApp(firebaseConfig);
 
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 
-export const solve = functions.https.onRequest((request: any, response: any) => {
+export const solve = functions.https.onRequest(async (request: any, response: any) => {
   functions.logger.info("Hello logs!", {structuredData: true});
-  response.json(solveCarpoolProblem(request.body.event));
+
+  // grab event first
+  let result = await firebase.firestore().collection("events").doc(request.query.eventId).get()
+  
+  let event = result.data();
+  
+  if(!event) {
+    response.json("error couldnt find event");
+    return;
+  }
+
+  let people = await Promise.all(
+    event.people.map(async (person: firebase.firestore.DocumentReference) => {
+        const personRef = await person.get();
+        return {
+          id: person.id,
+          ...personRef.data()
+        };
+    }),
+  )
+
+  event.people = people;
+
+  response.json(solveCarpoolProblem(event as Event));
 });
 
 /** 
@@ -81,8 +117,8 @@ function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
 
     const nextPassengerNode: any = pq.dequeue();
     if(!nextPassengerNode) continue;
-    const nextPassenger = getPersonById(people, nextPassengerNode.value.passengerId)
-    const minDriver = getPersonById(people, nextPassengerNode.value.minDriverId);
+    const nextPassenger = getPersonById(people, nextPassengerNode.passengerId)
+    const minDriver = getPersonById(people, nextPassengerNode.minDriverId);
 
     if(!nextPassenger || !minDriver) continue;
 
@@ -114,8 +150,18 @@ function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
       }
     }
   }
+  console.log(solution)
+  return strMapToObj(solution);
+}
 
-  return solution;
+function strMapToObj(strMap: any): any {
+  let obj = Object.create(null);
+  for (let [k,v] of strMap) {
+    // We don’t escape the key '__proto__'
+    // which can cause problems on older engines
+    obj[k] = v;
+  }
+  return obj;
 }
 
 function getSomeoneDrivingNoOne(drivers: People[], solution: Map<string, Array<string>>): People | undefined {
