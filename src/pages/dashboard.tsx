@@ -8,6 +8,7 @@ import classes from '*.module.css'
 import BackIcon from '@material-ui/icons/ArrowBackIosRounded'
 import Map from '../components/Map'
 import ListView from '../components/ListView'
+import useEventPeople from 'src/hooks/useEventPeople';
 
 const useStyles = makeStyles((theme) => ({
   menuButton: {
@@ -36,14 +37,16 @@ const DashBoard = () => {
       }
     }
   );
+  const people = useEventPeople(eventId);
+
+  console.log(people)
 
   if (!loading && !value?.data()) {
     globalAny.setNotification('error', 'Event not found.')
     history.push('/')
   }
 
-  const event = value?.data()
-  
+  const event = value?.data()  
 
   React.useEffect(() => {
     const showPosition = (position: any) => {
