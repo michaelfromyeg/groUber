@@ -1,7 +1,8 @@
 import React from 'react'
 import styles from '../styles/App.module.scss'
 import EventForm from '../components/EventForm'
-import GuestDetails from '../components/GuestDetails'
+import { Button } from '@material-ui/core'
+import firebase from 'firebase'
 
 const index = () => {
 
@@ -23,6 +24,16 @@ const index = () => {
           <EventForm />
         </p>
       </header>
+      <EventForm />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          firebase.auth().signOut()
+        }}
+      >
+        Logout
+      </Button>
     </div>
   )
 }
