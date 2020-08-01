@@ -22,6 +22,10 @@ const DashBoard = () => {
   const classes = useStyles()
   const { eventId } = useParams();
   const history = useHistory();
+  const [coord, setCoord] = useState({
+    lat: 0.0, 
+    lng: 0.0
+  })
 
   const [value, loading, error] = useDocument(
     firebase.firestore().collection("events").doc(eventId),
@@ -39,6 +43,27 @@ const DashBoard = () => {
 
   const event = value?.data()
   
+
+  React.useEffect(() => {
+    const showPosition = (position: any) => {
+      const lat = position.coords.latitude
+      const lng = position.coords.longitude
+      console.log(lat, lng)
+      setCoord({
+        lat: lat,
+        lng: lng
+      })
+    }
+  
+    // get user current location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      alert("your browser doesn't support maps") 
+    }
+  }, []) 
+  
+
   return (
     <>
       <AppBar position="static">
@@ -49,19 +74,18 @@ const DashBoard = () => {
             color="inherit"
             aria-label="menu"
             onClick={() => {
-              history.push('/')
+              history.push('/');
             }}
           >
             <BackIcon />
           </IconButton>
-          <Typography variant="h6">
-            groUber
-          </Typography>
+          <Typography variant="h6">groUber</Typography>
         </Toolbar>
       </AppBar>
-
-        
-
+      <Map
+        center={coord}
+        zoom={13}
+      />
     </>
   );
 }
