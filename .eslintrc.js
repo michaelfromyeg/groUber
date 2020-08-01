@@ -27,7 +27,7 @@ module.exports = {
     'camelcase': 'off',
     'comma-dangle': 2,
     'indent': ['error', 2],
-    'no-extra-semi': 2,
+    // 'no-extra-semi': 2,
     'no-irregular-whitespace': 2,
     'no-lonely-if': 2,
     'no-multi-spaces': 2,
@@ -37,7 +37,7 @@ module.exports = {
     'no-unreachable': 'error',
     'object-curly-spacing': ['error', 'always'],
     'quotes': 'off',
-    'semi': ['error', 'never'],
+    // 'semi': ['error', 'never'],
     "prettier/prettier": ["error"]
   },
   settings: {
