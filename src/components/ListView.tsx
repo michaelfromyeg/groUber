@@ -7,6 +7,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button'
+
 // fetch this data here from the database:
 const DUMMY_DATA = [
   {
@@ -52,6 +54,72 @@ const DUMMY_DATA = [
       }
     },
     seats: 3
+  },
+  {
+    name: 'Michael',
+    destination: {
+      address: 'Vancouver',
+      latlng: {
+        lat: 49,
+        lng: 49
+      }
+    },
+    seats: 0
+  },
+  {
+    name: 'Michael',
+    destination: {
+      address: 'Vancouver',
+      latlng: {
+        lat: 49,
+        lng: 49
+      }
+    },
+    seats: 0
+  },
+  {
+    name: 'Michael',
+    destination: {
+      address: 'Vancouver',
+      latlng: {
+        lat: 49,
+        lng: 49
+      }
+    },
+    seats: 0
+  },
+  {
+    name: 'Michael',
+    destination: {
+      address: 'Vancouver',
+      latlng: {
+        lat: 49,
+        lng: 49
+      }
+    },
+    seats: 0
+  }, 
+  {
+    name: 'Michael',
+    destination: {
+      address: 'Vancouver',
+      latlng: {
+        lat: 49,
+        lng: 49
+      }
+    },
+    seats: 0
+  },
+  {
+    name: 'Michael',
+    destination: {
+      address: 'Vancouver',
+      latlng: {
+        lat: 49,
+        lng: 49
+      }
+    },
+    seats: 0
   },
   {
     name: 'Michael',
@@ -113,16 +181,23 @@ const Person = (props: any) => {
 
 export default function ListView() {
   const classes = useStyles();
+  const y = window.innerHeight * 0.8
   return (
-    <List className={classes.root}>
-      {DUMMY_DATA.map((person) => (
-        <Person
-          key={person.name}
-          seats={person.seats}
-          name={person.name}
-          address={person.destination.address}
-        />
-      ))}
-    </List>
+      <div>
+        <List className={classes.root} style={{height: String(y) + "px", overflow: 'auto'}}>
+        {DUMMY_DATA.map((person) => (
+            <Person
+            key={person.name}
+            seats={person.seats}
+            name={person.name}
+            address={person.destination.address}
+            />
+        ))}
+        </List>
+        <br></br>
+        <Button variant="contained" color="secondary" style = {{margin: "auto"}}>
+            Find optimal route
+        </Button>
+     </div>
   );
 }
