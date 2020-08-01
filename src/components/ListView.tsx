@@ -8,6 +8,68 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 
+
+
+// fetch this data here from the database:
+const DUMMY_DATA = [
+    {
+        name: "Jack",
+        destination: {
+            address: "Vancouver",
+            latlng: {
+                lat: 49,
+                lng: 49
+            }
+        },
+        seats: 0
+    },
+    {
+        name: "Liang",
+        destination: {
+            address: "Vancouver",
+            latlng: {
+                lat: 49,
+                lng: 49
+            }
+        },
+        seats: 4
+    },
+    {
+        name: "Philly",
+        destination: {
+            address: "Vancouver",
+            latlng: {
+                lat: 49,
+                lng: 49
+            }
+        },
+        seats: 5
+    },
+    {
+        name: "Hasan",
+        destination: {
+            address: "Vancouver",
+            latlng: {
+                lat: 49,
+                lng: 49
+            }
+        },
+        seats: 3
+    },
+    {
+        name: "Michael",
+        destination: {
+            address: "Vancouver",
+            latlng: {
+                lat: 49,
+                lng: 49
+            }
+        },
+        seats: 0
+    }
+]
+
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -21,76 +83,46 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+
+
+const Person = (props: any) => {
+    const classes = useStyles();
+    return (<React.Fragment>
+            <ListItem alignItems="flex-start">
+            <ListItemAvatar>
+            <Avatar alt={props.name} src="" />
+            </ListItemAvatar>
+            <ListItemText
+            primary={props.name}
+            secondary={
+                <React.Fragment>
+                <Typography
+                    component="span"
+                    variant="body2"
+                    className={classes.inline}
+                    color="textPrimary"
+                >
+                    {props.address + "  -  "} 
+                </Typography>
+                {props.seats === 0 ? 
+                "Passenger" : "Seats: " + String(props.seats)}
+                </React.Fragment>
+            }
+            />
+        </ListItem>
+        <Divider variant="inset" component="li" />
+      </React.Fragment>)
+}
+
+
+
 export default function ListView() {
   const classes = useStyles();
-
   return (
     <List className={classes.root}>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Brunch this weekend?"
-          secondary={
-            <React.Fragment>
-              <Typography
-                component="span"
-                variant="body2"
-                className={classes.inline}
-                color="textPrimary"
-              >
-                Ali Connors
-              </Typography>
-              {" — I'll be in your neighborhood doing errands this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Summer BBQ"
-          secondary={
-            <React.Fragment>
-              <Typography
-                component="span"
-                variant="body2"
-                className={classes.inline}
-                color="textPrimary"
-              >
-                to Scott, Alex, Jennifer
-              </Typography>
-              {" — Wish I could come, but I'm out of town this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Oui Oui"
-          secondary={
-            <React.Fragment>
-              <Typography
-                component="span"
-                variant="body2"
-                className={classes.inline}
-                color="textPrimary"
-              >
-                Sandra Adams
-              </Typography>
-              {' — Do you have Paris recommendations? Have you ever…'}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
+        {
+            DUMMY_DATA.map((person) => <Person seats = {person.seats} name = {person.name} address = {person.destination.address}/>)
+        }
     </List>
   );
 }
