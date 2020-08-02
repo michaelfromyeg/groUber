@@ -24,7 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.solve = void 0;
 const functions = __importStar(require("firebase-functions"));
-const haversine_1 = __importDefault(require("haversine"));
+const DistanceMatrix_1 = require("./DistanceMatrix");
 // import { PriorityQueue, Node } from './PriorityQueue'
 const priorityqueue_1 = __importDefault(require("priorityqueue"));
 const firebase = __importStar(require("firebase"));
@@ -56,7 +56,7 @@ exports.solve = functions.https.onRequest(async (request, response) => {
         return Object.assign({ id: person.id }, personRef.data());
     }));
     event.people = people;
-    response.json(solveCarpoolProblem(event));
+    response.json(await solveCarpoolProblem(event));
 });
 /**
  * Solves the carpool problem. Given an event (containing a list of people)
@@ -66,14 +66,14 @@ exports.solve = functions.https.onRequest(async (request, response) => {
  * @param  {Event} event
  * @returns Map<string, Array<string>>
  */
-function solveCarpoolProblem(event) {
+async function solveCarpoolProblem(event) {
     const people = event.people;
     let remainingDrivers = getDrivers(people);
     let remainingPassengers = getPassengers(people);
+    let distanceMatrix = new DistanceMatrix_1.DistanceMatrix(people);
+    await distanceMatrix.init();
     const solution = new Map();
-    console.log(remainingPassengers, remainingDrivers);
     while (!isDone(remainingDrivers, remainingPassengers)) {
-        console.log(remainingPassengers, remainingDrivers);
         if (remainingPassengers.length > 0 && remainingDrivers.length === 0)
             break;
         // const distances = calculatePassengerDistances(remainingDrivers, remainingPassengers);
@@ -83,13 +83,29 @@ function solveCarpoolProblem(event) {
                 let minDriverDistance = Infinity;
                 let minDriverId = "";
                 for (let driver of remainingDrivers) {
-                    const distance = haversine_1.default({
+                    //   // calc distance between driver and passenger
+                    //   console.log("this shit ran")
+                    //   console.log(distanceMatrix.data.keys, distanceMatrix.data.values)
+                    //   console.log("this is the key were trying to get", {
+                    //     latitude: driver.location.latlng.lat,
+                    //     longitude: driver.location.latlng.lng
+                    // })
+                    const distanceMap = distanceMatrix.data.get({
                         latitude: driver.location.latlng.lat,
-                        longitude: driver.location.latlng.lng,
-                    }, {
+                        longitude: driver.location.latlng.lng
+                    });
+                    const distance = distanceMap.get({
                         latitude: passenger.location.latlng.lat,
-                        longitude: passenger.location.latlng.lng,
-                    }, { unit: 'meter' });
+                        longitude: passenger.location.latlng.lng
+                    });
+                    console.log(distance, " from ", passenger.name, driver.name);
+                    // const distance = haversine({
+                    //   latitude: driver.location.latlng.lat,
+                    //   longitude: driver.location.latlng.lng,
+                    // }, {
+                    //   latitude: passenger.location.latlng.lat,
+                    //   longitude: passenger.location.latlng.lng,
+                    // }, {unit: 'meter'})
                     if (distance < minDriverDistance) {
                         minDriverDistance = distance;
                         minDriverId = driver.id;
@@ -143,7 +159,6 @@ function solveCarpoolProblem(event) {
         }
         if (remainingPassengers.length === 0) {
             let driverToBeConverted = getSomeoneDrivingNoOne(remainingDrivers, solution);
-            console.log(driverToBeConverted);
             if (driverToBeConverted) {
                 // exists
                 remainingPassengers.push(driverToBeConverted);
@@ -153,9 +168,7 @@ function solveCarpoolProblem(event) {
                 break;
             }
         }
-        console.log("END WHILE", remainingPassengers, remainingDrivers);
     }
-    console.log(solution);
     return strMapToObj(solution);
 }
 function strMapToObj(strMap) {
