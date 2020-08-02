@@ -15,6 +15,7 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
         },
     });
     const members = useEventPeople(eventData);
+    console.log(members);
     return (
         <Map
             google={google}

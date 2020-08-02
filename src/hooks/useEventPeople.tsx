@@ -8,7 +8,9 @@ export default function useEventPeople(eventData: firebase.firestore.DocumentDat
 
     useEffect(() => {
         if (data) {
-            data.people.push(data.host);
+            // add host:
+            // data.people.push(data.host);
+
             Promise.all(
                 data.people.map(async (person: firebase.firestore.DocumentReference) => {
                     const personRef = await person.get();

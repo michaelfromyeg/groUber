@@ -9,131 +9,8 @@ import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { People } from '../_types/people';
-
-// fetch this data here from the database:
-const DUMMY_DATA = [
-    {
-        name: 'Jack',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 0,
-    },
-    {
-        name: 'Liang',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 4,
-    },
-    {
-        name: 'Philly',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 5,
-    },
-    {
-        name: 'Hasan',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 3,
-    },
-    {
-        name: 'Michael',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 0,
-    },
-    {
-        name: 'Michael',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 0,
-    },
-    {
-        name: 'Michael',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 0,
-    },
-    {
-        name: 'Michael',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 0,
-    },
-    {
-        name: 'Michael',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 0,
-    },
-    {
-        name: 'Michael',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 0,
-    },
-    {
-        name: 'Michael',
-        destination: {
-            address: 'Vancouver',
-            latlng: {
-                lat: 49,
-                lng: 49,
-            },
-        },
-        seats: 0,
-    },
-];
+import { Link, useParams } from 'react-router-dom';
+import LinkDisplay from '../components/LinkDisplay';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -174,17 +51,10 @@ const Person = ({ person }: { person: People }) => {
 };
 
 export default function ListView(props: any) {
+    const { eventId } = useParams();
     const classes = useStyles();
-    const y = window.innerHeight * 0.8;
+    const y = window.innerHeight * 0.6;
     const members: People[] = props.members;
-
-    for (let i = 0; i < members.length; i++) {
-        if (members[i].isHost) {
-            const removedElement = members[i];
-            members.splice(i, 1);
-            members.unshift(removedElement);
-        }
-    }
 
     return (
         <div style={{ textAlign: 'center' }}>
@@ -198,6 +68,17 @@ export default function ListView(props: any) {
             <Button variant="contained" color="secondary">
                 Find optimal route
             </Button>
+
+            <br></br>
+            <br></br>
+
+            <Button variant="contained" color="primary" component={Link} to={`/event/${eventId}/form`}>
+                {' '}
+                I am not at the event{' '}
+            </Button>
+            <br></br>
+            <br></br>
+            <LinkDisplay link={`https://grouper.online/event/${eventId}/form`} />
         </div>
     );
 }
