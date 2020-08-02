@@ -21,13 +21,14 @@ const useStyles = makeStyles((theme) => ({
 const globalAny: any = global
 
 const Dashboard = () => {
-    const classes = useStyles();
+    // const classes = useStyles();
     const { eventId } = useParams();
     const history = useHistory();
-    const [coord, setCoord] = useState({
-        lat: 0.0,
-        lng: 0.0,
-    });
+
+    // const [eventCoord, setEventCoord] = useState({
+    //     lat: 0.0,
+    //     lng: 0.0,
+    // });
 
     const [eventData, loading, error] = useDocument(firebase.firestore().collection('events').doc(eventId), {
         snapshotListenOptions: {
@@ -36,7 +37,6 @@ const Dashboard = () => {
     });
 
     const people = useEventPeople(eventData);
-    console.log(people)
 
     if (!loading && !eventData?.data()) {
         globalAny.setNotification('error', 'Event not found.');
@@ -45,34 +45,26 @@ const Dashboard = () => {
 
     const event = eventData?.data();
 
-    useEffect(() => {
-        const showPosition = (position: any) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            console.log(lat, lng);
-            setCoord({
-                lat: lat,
-                lng: lng,
-            });
-        };
+    // Get the location of event
 
-        // get user current location
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
-            alert(`Your browser doesn't support maps. Sorry about that :(`);
-        }
-    }, []);
+    // useEffect(() => {
+    //     for (let i = 0; i < people.length; i++) {
+    //         if (people[i].isHost) {
+    //             const host = people[i];
+    //             people.splice(i, 1);
+    //             setEventCoord(host.location.latlng);
+    //         }
+    //     }
+    // }, []);
 
     return (
         <>
             <Header />
-
             {/* Load map */}
             {/* Load side-menu */}
             <div style={{ display: 'flex' }}>
                 <ListView members={people} />
-                <Map center={coord}/>
+                <Map center={event ? event.destination.latlng : []} />
             </div>
         </>
     );
