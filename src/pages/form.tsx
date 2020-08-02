@@ -6,7 +6,7 @@ import { Grid, Hidden } from '@material-ui/core';
 const Form = () => {
     return (
         <div className={styles.app}>
-            <Grid container spacing={1}>
+            <Grid container>
                 <Grid item xs={12} lg={6}>
                     <div style={{ margin: 'auto' }}>
                         <header className={styles.app}>
@@ -28,6 +28,8 @@ const Form = () => {
                             height: '100vh',
                             backgroundSize: 'cover',
                             backgroundPositionY: '80%',
+                            position: 'fixed',
+                            right: 0,
                         }}
                     />
                 </Hidden>
