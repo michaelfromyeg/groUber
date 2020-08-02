@@ -8,6 +8,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import { People } from '../_types/people';
 
 // fetch this data here from the database:
 const DUMMY_DATA = [
@@ -147,22 +148,22 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const Person = (props: any) => {
+const Person = ({ person }: { person: People }) => {
     const classes = useStyles();
     return (
         <React.Fragment>
             <ListItem alignItems="flex-start">
                 <ListItemAvatar>
-                    <Avatar alt={props.name} src="" />
+                    <Avatar alt={person.name} src={person?.profilePicture || null} />
                 </ListItemAvatar>
                 <ListItemText
-                    primary={props.name}
+                    primary={`${person.name}${person?.isHost ? ' (is host)' : ''}`}
                     secondary={
                         <React.Fragment>
                             <Typography component="span" variant="body2" className={classes.inline} color="textPrimary">
-                                {props.address + '  -  '}
+                                {person.location.address + '  -  '}
                             </Typography>
-                            {props.seats === 0 ? 'Passenger' : 'Seats: ' + String(props.seats)}
+                            {person.seats === 0 ? 'Passenger' : 'Seats: ' + String(person.seats)}
                         </React.Fragment>
                     }
                 />
@@ -175,20 +176,23 @@ const Person = (props: any) => {
 export default function ListView(props: any) {
     const classes = useStyles();
     const y = window.innerHeight * 0.8;
+    const members: People[] = props.members;
+
+    for (let i = 0; i < members.length; i++) {
+        if (members[i].isHost) {
+            const removedElement = members[i];
+            members.splice(i, 1);
+            members.unshift(removedElement);
+        }
+    }
+
     return (
         <div style={{ textAlign: 'center' }}>
             <List className={classes.root} style={{ maxHeight: String(y) + 'px', overflow: 'auto' }}>
-                {props.members.map((person: any) => (
-                    <Person
-                        key={person.name}
-                        seats={person.seats}
-                        name={person.name}
-                        address={person.location.address}
-                    />
+                {members.map((person: People) => (
+                    <Person key={person.name} person={person} />
                 ))}
-                {props.members.length === 0 && (
-                    <h2 style={{ marginLeft: '37px', marginRight: '37px' }}> No members yet </h2>
-                )}
+                {members.length === 0 && <h2 style={{ marginLeft: '37px', marginRight: '37px' }}> No members yet </h2>}
             </List>
             <br></br>
             <Button variant="contained" color="secondary">

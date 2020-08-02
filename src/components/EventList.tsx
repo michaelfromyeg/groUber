@@ -65,6 +65,7 @@ const Event = (props: any) => {
 };
 
 const EventList = (props: any) => {
+    console.log(props.eventList);
     return (
         <Grid container justify="space-around">
             {props.eventList.map((event: any, index: any) => (

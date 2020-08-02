@@ -69,6 +69,7 @@ function EventForm() {
                             userId: currentUser.uid,
                             canDrive: false,
                             seats: 0,
+                            isHost: true,
                             location: {
                                 latlng,
                                 address,

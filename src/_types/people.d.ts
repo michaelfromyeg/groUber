@@ -1,6 +1,7 @@
 import { Address } from './address';
 
 export interface People {
+    event: any;
     id: string;
     name: string;
     email: string;
@@ -8,6 +9,7 @@ export interface People {
     userId: string;
     canDrive: boolean;
     seats: number;
+    isHost?: boolean;
     location: {
         address: Address;
         latlng: {
