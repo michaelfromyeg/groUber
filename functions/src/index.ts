@@ -49,7 +49,11 @@ export const directions = functions.https.onRequest(async (request: any, respons
                     console.log(request.body);
                     const axiosResult = await axios({
                         method: 'GET',
-                        url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${key}&origin=${request.body.origin}`,
+                        url: `https://maps.googleapis.com/maps/api/directions/json?destination=${
+                            request.body.destination
+                        }&key=${key}&origin=${request.body.origin}${
+                            request.body.waypoints && `&waypoints=${request.body.waypoints}`
+                        }`,
                     });
                     response.json(axiosResult.data);
                     return;
