@@ -8,6 +8,7 @@ import { DistanceMatrix } from './DistanceMatrix';
 import PriorityQueue from 'priorityqueue';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
+import Axios from 'axios';
 
 const firebaseConfig = {
     apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
@@ -256,3 +257,34 @@ function getPassengers(people: People[]): People[] {
         return !person.canDrive;
     });
 }
+
+// export const getEncoding = functions.https.onRequest(async (request: any, response: any) => {
+//     const { route } = request.body
+//     await Axios.get(
+//         `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&${waypoint}&key=${key}`,
+//     );
+//     const origin = route[0];
+//     const destination = route[route.length - 1];
+//             if (route.length > 3) {
+//                 let waypoint = 'waypoints=';
+//                 // , === %2C
+//                 // | seperate locations
+//                 for (let i = 1; i < route.length - 1; i++) {
+//                     if (i == route.length - 2) {
+//                         waypoint = waypoint + route[i].lat + '%2C' + route[i].lat;
+//                     } else {
+//                         waypoint = waypoint + route[i].lat + '%2C' + route[i].lat + '|';
+//                     }
+//                 }
+
+//                 const response = await axios.get(
+//                     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&${waypoint}&key=${key}`,
+//                 );
+//                 // console.log(response);
+//             } else {
+//                 // const response = await axios.get(
+//                 //     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&key=${key}`,
+//                 // );
+//                 // console.log(response);
+//             }
+// }

@@ -7,8 +7,8 @@ interface LatLng {
 function idToLatLngFunc(members: any) {
     const res: { [id: string]: LatLng } = {};
     for (const member of members) {
-        console.log(member);
-        res[member.userId] = member.location.latlng;
+        // console.log(member);
+        res[member.id] = member.location.latlng;
     }
     return res;
 }

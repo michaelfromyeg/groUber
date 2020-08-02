@@ -9,10 +9,13 @@ export default function useEventPeople(event: Event): People[] {
     useEffect(() => {
         if (event) {
             Promise.all(
-                (event.people as firebase.firestore.DocumentReference[]).map(
+                ((event.people as unknown) as firebase.firestore.DocumentReference[]).map(
                     async (person: firebase.firestore.DocumentReference) => {
                         const personRef = await person.get();
-                        return personRef.data();
+                        return {
+                            id: personRef.id,
+                            ...personRef.data(),
+                        };
                     },
                 ),
             ).then((result) => {
