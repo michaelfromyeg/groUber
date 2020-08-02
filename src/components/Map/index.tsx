@@ -3,16 +3,17 @@ import { Map, GoogleApiWrapper, Marker, Polyline } from 'google-maps-react';
 import theme from './theme';
 import useEventPeople from '../../hooks/useEventPeople';
 import { useParams } from 'react-router-dom';
-import { useDocument } from 'react-firebase-hooks/firestore';
+import { useDocumentData } from 'react-firebase-hooks/firestore';
 import firebase from 'firebase';
 import { People } from 'src/_types/people';
 import idToLatLngFunc from './id-to-lat-lng.js';
+import { Event } from 'src/_types/event';
 
 const MapContainer = ({ google, center }: { google: any; center: google.maps.LatLngLiteral }): ReactElement => {
     // each polyline represents a route for a driver.
 
     const { eventId } = useParams();
-    const [eventData, loading, error] = useDocument(firebase.firestore().collection('events').doc(eventId), {
+    const [eventData] = useDocumentData<Event>(firebase.firestore().collection('events').doc(eventId), {
         snapshotListenOptions: {
             includeMetadataChanges: true,
         },
@@ -26,7 +27,7 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
             zoom={13}
             styles={theme}
             initialCenter={center}
-            containerStyle={{ height: 'calc(100vh - 64px)', width: '82.5vw' }}
+            containerStyle={{ height: 'calc(100vh - 64px)', width: '100vw' }}
         >
             <Marker label={'Destination'} position={center}></Marker>
             {members.map((person: People) => {
