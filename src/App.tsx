@@ -11,7 +11,7 @@ import Login from './pages/login';
 import * as firebase from 'firebase';
 import 'firebase/auth';
 
-function PrivateRoute({ component: Component, ...rest }: any) {
+function PrivateRoute({ component: Component, ...rest }: any): ReactElement {
     return (
         <Route
             {...rest}
@@ -27,7 +27,7 @@ function PrivateRoute({ component: Component, ...rest }: any) {
     );
 }
 
-function PublicRoute({ component: Component, onUserLogin, ...rest }: any) {
+function PublicRoute({ component: Component, onUserLogin, ...rest }: any): ReactElement {
     return (
         <Route
             {...rest}
@@ -45,9 +45,8 @@ function PublicRoute({ component: Component, onUserLogin, ...rest }: any) {
 }
 
 const App = (): ReactElement => {
-    const [user, setUser] = useState(firebase.auth().currentUser);
+    const [, setUser] = useState(firebase.auth().currentUser);
     firebase.auth().onAuthStateChanged(setUser);
-    console.log('app.tsx')
     return (
         <ThemeProvider theme={theme}>
             <Router>
