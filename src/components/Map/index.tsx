@@ -3,18 +3,20 @@ import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
 import theme from './theme';
 import useEventPeople from '../../hooks/useEventPeople';
 import { useParams } from 'react-router-dom';
-import { useDocument } from 'react-firebase-hooks/firestore';
+import { useDocumentData } from 'react-firebase-hooks/firestore';
 import firebase from 'firebase';
 import { People } from 'src/_types/people';
+import { Event } from 'src/_types/event';
 
 const MapContainer = ({ google, center }: { google: any; center: google.maps.LatLngLiteral }): ReactElement => {
     const { eventId } = useParams();
-    const [eventData, loading, error] = useDocument(firebase.firestore().collection('events').doc(eventId), {
+    const [eventData] = useDocumentData<Event>(firebase.firestore().collection('events').doc(eventId), {
         snapshotListenOptions: {
             includeMetadataChanges: true,
         },
     });
     const members = useEventPeople(eventData);
+    console.log(members);
     return (
         <Map
             google={google}

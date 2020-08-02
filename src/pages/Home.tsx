@@ -14,7 +14,7 @@ import { Event } from 'src/_types/event';
 const Home = (): ReactElement => {
     const [events, setEvents] = useState(null);
 
-    const [eventSnapshot, loading, error] = useCollectionData<People>(
+    const [eventSnapshot, loading] = useCollectionData<People>(
         firebase
             .firestore()
             .collection('people')
@@ -30,12 +30,12 @@ const Home = (): ReactElement => {
 
     const fetchEvents = async () => {
         if (eventSnapshot) {
-            const events: any = [];
+            const events: Event[] = [];
             await Promise.all(
                 eventSnapshot?.map(async (doc) => {
-                    const eventRef = doc.event;
+                    const eventRef = doc.event as firebase.firestore.DocumentReference<firebase.firestore.DocumentData>;
                     const event = await eventRef?.get();
-                    if (event) events.push({ id: event.id, ...event.data() });
+                    if (event) events.push({ id: event.id, ...(event.data() as Event) });
                 }),
             );
             setEvents(events);
