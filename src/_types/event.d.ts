@@ -1,11 +1,11 @@
 import { People } from './people';
 
 export interface Event {
-    _id?: string;
+    id?: string;
     name?: string;
     date?: Date;
-    host?: People;
-    people?: People[];
+    host?: People | firebase.firestore.DocumentReference;
+    people?: People[] | firebase.firestore.DocumentReference[];
     destination?: {
         address?: string;
         latlng?: {

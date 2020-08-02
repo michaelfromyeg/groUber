@@ -4,19 +4,14 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as firebase from 'firebase';
-import { useHistory, useParams } from 'react-router-dom';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng, Suggestion } from 'react-places-autocomplete';
+import { useParams } from 'react-router-dom';
 import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces';
-import { Radio, Collapse, Divider } from '@material-ui/core';
+import { Collapse } from '@material-ui/core';
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { Event } from '../_types/event';
 import 'firebase/auth';
@@ -44,12 +39,11 @@ const useStyles = makeStyles((theme) => ({
 
 function GuestForm() {
     const classes = useStyles();
-    const history = useHistory();
     const db = firebase.firestore();
     const { eventId } = useParams();
     const [host, setHost] = useState<People>(null);
 
-    const [event, loading, error] = useDocument(firebase.firestore().collection('events').doc(eventId), {
+    const [event] = useDocument(firebase.firestore().collection('events').doc(eventId), {
         snapshotListenOptions: {
             includeMetadataChanges: true,
         },
