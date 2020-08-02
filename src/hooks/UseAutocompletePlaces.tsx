@@ -36,7 +36,7 @@ export default function useAutocompletePlaces(locationType: string) {
     const classes = useStyles();
     const [value, setValue] = React.useState<PlaceType | null>(null);
     const [inputValue, setInputValue] = React.useState('');
-    const [latLng, setLatLng] = React.useState({});
+    const [latLng, setLatLng] = React.useState<any>({});
     const [options, setOptions] = React.useState<PlaceType[]>([]);
     const loaded = React.useRef(false);
 
@@ -101,7 +101,7 @@ export default function useAutocompletePlaces(locationType: string) {
             onChange={async (event: any, newValue: any) => {
                 setOptions(newValue ? [newValue, ...options] : options);
                 setValue(newValue);
-                const address = typeof newValue === 'string' ? newValue : (newValue as PlaceType).description;
+                const address = typeof newValue === 'string' ? newValue : (newValue as PlaceType)?.description;
 
                 const results = await geocodeByAddress(address);
                 const latlng = await getLatLng(results[0]);
@@ -143,5 +143,5 @@ export default function useAutocompletePlaces(locationType: string) {
 
     const address = typeof inputValue === 'string' ? inputValue : (inputValue as PlaceType).description;
 
-    return [address, latLng, render];
+    return [address, latLng, render, setLatLng, setInputValue, setValue];
 }

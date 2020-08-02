@@ -12,10 +12,13 @@ import * as firebase from 'firebase';
 import { useParams } from 'react-router-dom';
 import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces';
 import { Collapse, CircularProgress } from '@material-ui/core';
-import { useDocument } from 'react-firebase-hooks/firestore';
+import { useDocument, useCollectionData } from 'react-firebase-hooks/firestore';
 import { Event } from '../_types/event';
 import 'firebase/auth';
 import { People } from 'src/_types/people';
+import throttle from 'lodash/throttle';
+
+const autocompleteService: any = { current: null };
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -49,7 +52,9 @@ function GuestForm() {
         },
     });
 
-    const [address, latlng, AutoCompletePlaces] = useAutoCompletePlaces('Add Your Location');
+    const [address, latlng, AutoCompletePlaces, setLatLng, setInputValue, setValue] = useAutoCompletePlaces(
+        'Add Your Location',
+    );
     const [seats, setSeats] = useState('0');
     const [submitted, setSubmit] = useState<boolean>(false);
 
@@ -61,29 +66,62 @@ function GuestForm() {
         eventHost?.get()?.then((host) => {
             setHost(host.data() as People);
         });
+        if (event?.ref) {
+            db.collection('people')
+                .where('userId', '==', firebase.auth().currentUser.uid)
+                .where('event', '==', event.ref)
+                .get()
+                .then((data) => {
+                    const oldData: People = data.docs[0].data() as People;
+                    new (window as any).google.maps.places.AutocompleteService().getPlacePredictions(
+                        { input: String(oldData?.location?.address) },
+                        (results?: PlaceType[]) => {
+                            setValue(results[0]);
+                        },
+                    );
+                    setInputValue(oldData?.location?.address);
+                    setLatLng(oldData?.location?.latlng);
+                    setChecked(oldData?.canDrive);
+                    setSeats(String(oldData?.seats || 0));
+                });
+        }
     }, [event]);
 
     const currentUser = firebase.auth().currentUser;
     async function handleSubmit(e: any) {
         e.preventDefault();
-        const result = await db.collection('people').add({
-            name: currentUser.displayName,
-            email: currentUser.email,
-            profilePicture: currentUser.photoURL,
-            userId: currentUser.uid,
-            canDrive: checked,
-            seats: checked ? Number(seats) : 0,
-            location: {
-                latlng,
-                address,
-            },
-            event: event.ref,
-        });
-
-        await event.ref.update({
-            people: firebase.firestore.FieldValue.arrayUnion(result),
-        });
-
+        const exists = await db
+            .collection('people')
+            .where('userId', '==', firebase.auth().currentUser.uid)
+            .where('event', '==', event.ref)
+            .get();
+        if (exists.docs.length > 0) {
+            exists.docs[0].ref.update({
+                canDrive: checked,
+                seats: checked ? Number(seats) : 0,
+                location: {
+                    latlng,
+                    address,
+                },
+            });
+        } else {
+            const result = await db.collection('people').add({
+                name: currentUser.displayName,
+                email: currentUser.email,
+                profilePicture: currentUser.photoURL,
+                userId: currentUser.uid,
+                canDrive: checked,
+                seats: checked ? Number(seats) : 0,
+                location: {
+                    latlng,
+                    address,
+                },
+                event: event.ref,
+            });
+            await event.ref.update({
+                people: firebase.firestore.FieldValue.arrayUnion(result),
+            });
+        }
         setSubmit(true);
     }
 
@@ -133,6 +171,7 @@ function GuestForm() {
                                     label="Number of Seats Available"
                                     type="number"
                                     fullWidth
+                                    value={seats}
                                     onChange={(e) => setSeats(e.target.value)}
                                     InputLabelProps={{
                                         shrink: true,
