@@ -7,36 +7,54 @@ import Footer from '../components/Footer';
 import EventList from '../components/EventList';
 import Typography from '@material-ui/core/Typography';
 import * as firebase from 'firebase';
+import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { People } from 'src/_types/people';
+import { Event } from 'src/_types/event';
 
 const Home = (): ReactElement => {
     const [events, setEvents] = useState(null);
 
-    const fetchEvents = async () => {
-        const events: any = [];
-        const eventSnapshot = await firebase
+    const [eventSnapshot, loading, error] = useCollectionData<People>(
+        firebase
             .firestore()
-            .collection('events')
-            .where('organizerUid', '==', firebase.auth().currentUser.uid)
-            .get();
-        eventSnapshot.forEach((doc) => {
-            events.push({ id: doc.id, ...doc.data() });
-        });
-        console.log(events);
-        setEvents(events);
+            .collection('people')
+            .where('userId', '==', firebase.auth().currentUser.uid)
+            .where('isHost', '==', true),
+        {
+            idField: 'id',
+            snapshotListenOptions: {
+                includeMetadataChanges: true,
+            },
+        },
+    );
+
+    const fetchEvents = async () => {
+        if (eventSnapshot) {
+            const events: any = [];
+            await Promise.all(
+                eventSnapshot?.map(async (doc) => {
+                    const eventRef = doc.event;
+                    const event = await eventRef?.get();
+                    if (event) events.push({ id: event.id, ...event.data() });
+                }),
+            );
+            setEvents(events);
+        }
     };
 
     useEffect(() => {
-        const getEvents = async () => {
-            await fetchEvents();
-        };
-        getEvents();
-    }, []);
+        fetchEvents();
+    }, [eventSnapshot]);
 
     return (
         <div className={styles.app}>
             <Header />
             <EventForm />
-            {events == null ? <Typography variant="body1">Loading...</Typography> : <EventList eventList={events} />}
+            {events == null || loading ? (
+                <Typography variant="body1">Loading...</Typography>
+            ) : (
+                <EventList eventList={events} />
+            )}
             <Footer />
         </div>
     );
