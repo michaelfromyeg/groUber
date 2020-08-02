@@ -11,14 +11,11 @@ import Button from '@material-ui/core/Button';
 import { People } from '../_types/people';
 import { Link, useParams } from 'react-router-dom';
 import LinkDisplay from '../components/LinkDisplay';
-import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@material-ui/core';
+import { IconButton, Dialog, DialogTitle, DialogContent } from '@material-ui/core';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import * as firebase from 'firebase';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
-
-const result: any = {
-    yW08iZS1F49hqoJbbtn7: ['3QfqQPCWlkP8aMZW6jbe', 'WffbqCEpiVAM3QoAtSr8'],
-};
+import { useFetch } from 'src/hooks/UseFetch';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -120,6 +117,8 @@ export default function ListView(props: any) {
     const members: People[] = props.members;
     const [showResult, setShowResult] = useState(false);
 
+    const result = useFetch(`https://us-central1-find-my-carpool.cloudfunctions.net/solve?eventId=${eventId}`);
+
     return (
         <div style={{ textAlign: 'center' }}>
             <List className={classes.root} style={{ maxHeight: String(y) + 'px', overflow: 'auto' }}>
@@ -165,9 +164,10 @@ export default function ListView(props: any) {
                 <DialogTitle id="customized-dialog-title">Assignments</DialogTitle>
                 <DialogContent dividers>
                     <List className={classes.root} style={{ maxHeight: String(y) + 'px', overflow: 'auto' }}>
-                        {Object.keys(result).map((driverId) => (
-                            <Driver key={driverId} personId={driverId} passengerIds={result[driverId]} />
-                        ))}
+                        {Boolean(!result.loading && result.data) &&
+                            Object.keys(result?.data).map((driverId) => (
+                                <Driver key={driverId} personId={driverId} passengerIds={result?.data[driverId]} />
+                            ))}
                     </List>
                 </DialogContent>
             </Dialog>
