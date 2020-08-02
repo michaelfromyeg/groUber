@@ -5,12 +5,12 @@ export interface Event {
     name?: string;
     date?: Date;
     host?: People;
-    people?: People[];
+    people: People[];
     destination?: {
         address?: string;
         latlng?: {
-            lat?: double;
-            lng?: double;
+            lat?: number;
+            lng?: number;
         };
     };
     path?: any; // TODO:
