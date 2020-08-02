@@ -3,12 +3,11 @@ import { Event } from '../../src/_types/event';
 import { People } from '../../src/_types/people';
 
 import { DistanceMatrix } from './DistanceMatrix';
-
-// import { PriorityQueue, Node } from './PriorityQueue'
-import PriorityQueue from 'priorityqueue';
 import * as firebase from 'firebase';
+import * as admin from 'firebase-admin';
+import PriorityQueue from 'priorityqueue';
 import 'firebase/firestore';
-import Axios from 'axios';
+import axios from 'axios';
 
 const firebaseConfig = {
     apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
@@ -22,8 +21,42 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
+admin.initializeApp(firebaseConfig);
+
+export const directions = functions.https.onRequest(
+    async (request: any, response: any): Promise<void> => {
+        response.set('Access-Control-Allow-Origin', '*');
+        if (request.method !== 'POST') {
+            response.status(405).json({ message: 'Method Not Allowed.' });
+            return;
+        } else if (!request.get('Access-Token')) {
+            response.status(401).json({ message: 'Unauthorized.' });
+            return;
+        } else if (!process.env.key) {
+            response.status(403).json({ message: 'Service Unavailable' });
+            return;
+        } else {
+            try {
+                const verify = await admin.auth().verifyIdToken(request.get('Access-Token'));
+                if (!verify.uid) {
+                    response.status(403).json({ message: 'Service Unavailable' });
+                    return;
+                } else {
+                    console.log(request.body.destination);
+                    const axiosResult = await axios({
+                        method: 'GET',
+                        url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${process.env.key}&origin=${request.body.origin}`,
+                    });
+                    response.json(axiosResult.data);
+                    return;
+                }
+            } catch (err) {
+                response.status(401).json({ message: err.message });
+                return;
+            }
+        }
+    },
+);
 
 export const solve = functions.https.onRequest(async (request: any, response: any) => {
     response.set('Access-Control-Allow-Origin', '*');

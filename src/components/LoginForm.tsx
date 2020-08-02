@@ -47,7 +47,8 @@ function LoginForm() {
                         firebase
                             .auth()
                             .signInWithPopup(provider)
-                            .then(() => {
+                            .then((result) => {
+                                result.user.getIdToken().then((x) => console.log(x));
                                 globalAny.setNotification('success', 'Successfully Logged In!');
                             })
                             .catch(() => {

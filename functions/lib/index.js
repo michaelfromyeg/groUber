@@ -22,13 +22,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.solve = void 0;
+exports.solve = exports.directions = void 0;
 const functions = __importStar(require("firebase-functions"));
 const DistanceMatrix_1 = require("./DistanceMatrix");
+const firebase = __importStar(require("firebase"));
+const admin = __importStar(require("firebase-admin"));
 // import { PriorityQueue, Node } from './PriorityQueue'
 const priorityqueue_1 = __importDefault(require("priorityqueue"));
-const firebase = __importStar(require("firebase"));
 require("firebase/firestore");
+const axios_1 = __importDefault(require("axios"));
 const firebaseConfig = {
     apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
     authDomain: 'find-my-carpool.firebaseapp.com',
@@ -40,8 +42,47 @@ const firebaseConfig = {
     measurementId: 'G-YSVSBWXT23',
 };
 firebase.initializeApp(firebaseConfig);
+admin.initializeApp(firebaseConfig);
+process.env.key = 'AIzaSyAuzFugM9P3wIs0t_mDggEuNTMRl1aPync';
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
+exports.directions = functions.https.onRequest(async (request, response) => {
+    response.set('Access-Control-Allow-Origin', '*');
+    if (request.method !== 'POST') {
+        response.status(405).json({ message: 'Method Not Allowed.' });
+        return;
+    }
+    else if (!request.get('Access-Token')) {
+        response.status(401).json({ message: 'Unauthorized.' });
+        return;
+    }
+    else if (!process.env.key) {
+        response.status(403).json({ message: 'Service Unavailable' });
+        return;
+    }
+    else {
+        try {
+            const verify = await admin.auth().verifyIdToken(request.get('Access-Token'));
+            if (!verify.uid) {
+                response.status(403).json({ message: 'Service Unavailable' });
+                return;
+            }
+            else {
+                console.log(request.body.destination);
+                const axiosResult = await axios_1.default({
+                    method: 'GET',
+                    url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${process.env.key}&origin=${request.body.origin}`,
+                });
+                response.json(axiosResult.data);
+                return;
+            }
+        }
+        catch (err) {
+            response.status(401).json({ message: err.message });
+            return;
+        }
+    }
+});
 exports.solve = functions.https.onRequest(async (request, response) => {
     response.set('Access-Control-Allow-Origin', '*');
     functions.logger.info('Hello logs!', { structuredData: true });
@@ -238,4 +279,33 @@ function getPassengers(people) {
         return !person.canDrive;
     });
 }
+// export const getEncoding = functions.https.onRequest(async (request: any, response: any) => {
+//     const { route } = request.body
+//     await Axios.get(
+//         `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&${waypoint}&key=${key}`,
+//     );
+//     const origin = route[0];
+//     const destination = route[route.length - 1];
+//             if (route.length > 3) {
+//                 let waypoint = 'waypoints=';
+//                 // , === %2C
+//                 // | seperate locations
+//                 for (let i = 1; i < route.length - 1; i++) {
+//                     if (i == route.length - 2) {
+//                         waypoint = waypoint + route[i].lat + '%2C' + route[i].lat;
+//                     } else {
+//                         waypoint = waypoint + route[i].lat + '%2C' + route[i].lat + '|';
+//                     }
+//                 }
+//                 const response = await axios.get(
+//                     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&${waypoint}&key=${key}`,
+//                 );
+//                 // console.log(response);
+//             } else {
+//                 // const response = await axios.get(
+//                 //     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&key=${key}`,
+//                 // );
+//                 // console.log(response);
+//             }
+// }
 //# sourceMappingURL=index.js.map
