@@ -75,8 +75,8 @@ function GuestForm() {
             email: currentUser.email,
             profilePicture: currentUser.photoURL,
             userId: currentUser.uid,
-            canDrive: checked ? Number(seats) : 0,
-            seats: 0,
+            canDrive: checked,
+            seats: checked ? Number(seats) : 0,
             location: {
                 latlng,
                 address,
