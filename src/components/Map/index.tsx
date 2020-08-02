@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useState, useEffect } from 'react';
 import { Map, GoogleApiWrapper, Marker, Polyline } from 'google-maps-react';
 import theme from './theme';
 import useEventPeople from '../../hooks/useEventPeople';
@@ -29,15 +29,22 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
             includeMetadataChanges: true,
         },
     });
-    const solution = useFetch(`https://us-central1-find-my-carpool.cloudfunctions.net/solve?eventId=${eventId}`);
+    let [solution, setSolution] = useState(undefined);
+    useEffect(() => {
+        const data = axios.get(`https://us-central1-find-my-carpool.cloudfunctions.net/solve?eventId=${eventId}`)
+        .then(res => {
+            setSolution(res.data);
+        })
+    }, [eventData])
+
     // (eventData);
     const members = useEventPeople(eventData);
     const idToLatLng = idToLatLngFunc(members);
     // console.log(idToLatLng, members);
     // console.log('members: ' + members);
     const answer: any = [];
-    for (const driver in solution.data) {
-        const path = [...solution.data[driver]];
+    for (const driver in solution) {
+        const path = [...solution[driver]];
         console.log(path);
         path.unshift(driver);
         const newPath = path.map((id) => idToLatLng[id]);
@@ -54,68 +61,93 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
      * ]
      *
      */
-    const newPath: any = [];
     /**
      * newPath SHOULD be [
      *  [{lat, lng}, {lat, lng} ... ], [{lat, lng}, {lat, lng} ... ]
      * ]
      */
+
+    const [newPath, setNewPath] = useState([]);
+
     const generatePaths = async () => {
         // console.log('generate paths');
-        for (const route of answer) {
-            const destination = eventData.destination.latlng.lat + '%2C' + eventData.destination.latlng.lng;
-            const begin = route[0].lat + '%2C' + route[0].lng;
-            let response;
-            if (route.length >= 2) {
-                let waypoint = '';
-                // , === %2C
-                // | seperate locations
-                for (let i = 1; i < route.length; i++) {
-                    if (i == route.length - 1) {
-                        waypoint = waypoint + route[i].lat + '%2C' + route[i].lng;
-                    } else {
-                        waypoint = waypoint + route[i].lat + '%2C' + route[i].lng + '|';
+
+        let newPath2 = await Promise.all(answer.map(async (route: any): Promise<any> => {
+                const destination = eventData.destination.latlng.lat + ',' + eventData.destination.latlng.lng;
+                const begin = route[0].lat + ',' + route[0].lng;
+                let response;
+                if (route.length >= 2) {
+                    let waypoint = '';
+                    // , === %2C
+                    // | seperate locations
+                    for (let i = 1; i < route.length; i++) {
+                        if (i == route.length - 1) {
+                            waypoint = waypoint + route[i].lat + ',' + route[i].lng;
+                        } else {
+                            waypoint = waypoint + route[i].lat + ',' + route[i].lng + '|';
+                        }
                     }
+                    // const response = await axios.get(
+                    //     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&${waypoint}&key=${key}`,
+                    // );
+                    route.shift();
+    
+                    console.log(destination, begin, waypoint)
+    
+                    response = await axios.post('https://us-central1-find-my-carpool.cloudfunctions.net/directions', {
+                        destination,
+                        origin: begin,
+                        waypoints: waypoint,
+                    }, {
+                        headers: {
+                            'Access-Token': await firebase.auth().currentUser.getIdToken()
+                        }
+                    })
+    
+                    // console.log(response);
+                } else {
+                    // const response = await axios.get(
+                    //     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&key=${key}`,
+                    // );
+                    // console.log(response);
+                    console.log(begin, destination);
+                    response = await axios.post('https://us-central1-find-my-carpool.cloudfunctions.net/directions', {
+                        destination,
+                        origin: begin,
+                        waypoint: ''
+                    }, {
+                        headers: {
+                            'Access-Token': await firebase.auth().currentUser.getIdToken()
+                        }
+                    })
+                    console.log(response)
                 }
-                // const response = await axios.get(
-                //     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&${waypoint}&key=${key}`,
-                // );
-                route.shift();
-
-                response = await axios.post('https://us-central1-find-my-carpool.cloudfunctions.net/directions', {
-                    destination,
-                    origin,
-                    waypoints: waypoint,
-                })
-
-                // console.log(response);
-            }
-            if (route.length <= 1) {
-            } else {
-                // const response = await axios.get(
-                //     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&key=${key}`,
-                // );
-                // console.log(response);
-                console.log(origin, destination);
-                response = await axios.post('https://us-central1-find-my-carpool.cloudfunctions.net/directions', {
-                    destination,
-                    origin
-                })
-            }
-
-            // newPath.push('_h~jHpbtnVBgg@?eb@BiW@{G@uH@_E?_F}EB{NDuD?aF@sB?gCGeE?sQ?yID{DAmCBeAJYJ[RaAp@]HqEFuF?oBIsE?uCA?k@@{EiCAKEGQAY?}E')
-            newPath.push(google.maps.geometry.encoding.decodePath(response.data.routes[0].overview_polyline.points.replace('\\', '\\\\')));
-        }
+    
+                // newPath.push('_h~jHpbtnVBgg@?eb@BiW@{G@uH@_E?_F}EB{NDuD?aF@sB?gCGeE?sQ?yID{DAmCBeAJYJ[RaAp@]HqEFuF?oBIsE?uCA?k@@{EiCAKEGQAY?}E')
+                console.log(response.data.routes[0].overview_polyline.points)
+                if(response.data.routes[0]){
+                    return (google.maps.geometry.encoding.decodePath(response.data.routes[0].overview_polyline.points));
+                }
+        }))
+        setNewPath(newPath2);
+        console.log(newPath2)
     };
 
+    console.log(newPath)
+
+    // console.log("newpath:", newPath[0], newPath.length, newPath)
 
     // console.log(window.google);
-    if (google.maps.geometry) {
-        // generate an encoded response per route
-        // for each route in answer
-        // encode it
-        generatePaths();
-    }
+
+    useEffect(() => {
+        if (google.maps.geometry) {
+            // generate an encoded response per route
+            // for each route in answer
+            // encode it
+            generatePaths();
+        }
+    }, [solution])
+    
     return (
         <Map
             google={google}
@@ -138,7 +170,7 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
                     />
                 );
             })}
-            {newPath.map((path: any) => {
+            {newPath?.map((path: any) => {
                 const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
                 return <Polyline key="" path={path} strokeColor={randomColor} strokeOpacity={1} strokeWeight={3} />;
             })}

@@ -43,7 +43,7 @@ export const directions = functions.https.onRequest(
                     response.status(403).json({ message: 'Service Unavailable' });
                     return;
                 } else {
-                    console.log(request.body.destination);
+                    console.log(request.body);
                     const axiosResult = await axios({
                         method: 'GET',
                         url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${key}&origin=${request.body.origin}`,
