@@ -1,15 +1,14 @@
 import * as functions from 'firebase-functions';
 import { Event } from '../../src/_types/event'
 import { People } from '../../src/_types/people'
-import haversine from 'haversine';
+
+import {DistanceMatrix} from "./DistanceMatrix"
 
 // import { PriorityQueue, Node } from './PriorityQueue'
 import PriorityQueue from 'priorityqueue';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
-import axios from 'axios';
 
-const key = 'prj_live_pk_7a9bbe078da0cfa051f77e2c9d9d0f929b9e5955';
 
 const firebaseConfig = {
     apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
@@ -26,6 +25,8 @@ firebase.initializeApp(firebaseConfig);
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
+
+
 
 export const solve = functions.https.onRequest(async (request: any, response: any) => {
   functions.logger.info("Hello logs!", {structuredData: true});
@@ -50,9 +51,9 @@ export const solve = functions.https.onRequest(async (request: any, response: an
     }),
   )
 
-  event.people = people;
+  event.people = people
 
-  response.json(solveCarpoolProblem(event as Event));
+  response.json(await solveCarpoolProblem(event as Event));
 });
 
 /** 
@@ -63,18 +64,18 @@ export const solve = functions.https.onRequest(async (request: any, response: an
  * @param  {Event} event
  * @returns Map<string, Array<string>>
  */
-function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
+async function solveCarpoolProblem(event: Event): Promise<Map<string, Array<string>>> {
   const people = event.people;
-  let remainingDrivers = getDrivers(people);
-  let remainingPassengers = getPassengers(people);
+  let remainingDrivers = getDrivers(people as People[]);
+  let remainingPassengers = getPassengers(people as People[]);
+  let distanceMatrix : DistanceMatrix= new DistanceMatrix(people as People[])
+  await distanceMatrix.init();
 
   const solution = new Map<string, Array<string>>();
 
-  console.log(remainingPassengers, remainingDrivers)
 
   while (!isDone(remainingDrivers, remainingPassengers)) {
 
-    console.log(remainingPassengers, remainingDrivers)
 
     if(remainingPassengers.length > 0 && remainingDrivers.length === 0) break;
     // const distances = calculatePassengerDistances(remainingDrivers, remainingPassengers);
@@ -87,13 +88,35 @@ function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
         let minDriverDistance = Infinity;
         let minDriverId = "";
         for(let driver of remainingDrivers) {
-          const distance = haversine({
+        //   // calc distance between driver and passenger
+        //   console.log("this shit ran")
+        //   console.log(distanceMatrix.data.keys, distanceMatrix.data.values)
+
+        //   console.log("this is the key were trying to get", {
+        //     latitude: driver.location.latlng.lat,
+        //     longitude: driver.location.latlng.lng
+        // })
+
+          const distanceMap = distanceMatrix.data.get({
             latitude: driver.location.latlng.lat,
-            longitude: driver.location.latlng.lng,
-          }, {
+            longitude: driver.location.latlng.lng
+          });
+
+          const distance = distanceMap.get({
             latitude: passenger.location.latlng.lat,
-            longitude: passenger.location.latlng.lng,
-          }, {unit: 'meter'})
+            longitude: passenger.location.latlng.lng
+          })
+
+          console.log(distance, " from ", passenger.name, driver.name)
+          
+
+          // const distance = haversine({
+          //   latitude: driver.location.latlng.lat,
+          //   longitude: driver.location.latlng.lng,
+          // }, {
+          //   latitude: passenger.location.latlng.lat,
+          //   longitude: passenger.location.latlng.lng,
+          // }, {unit: 'meter'})
 
           if(distance < minDriverDistance) {
             minDriverDistance = distance;
@@ -128,8 +151,8 @@ function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
 
       const nextPassengerNode: any = pq.dequeue();
       if(!nextPassengerNode) continue;
-      const nextPassenger = getPersonById(people, nextPassengerNode.passengerId)
-      const minDriver = getPersonById(people, nextPassengerNode.minDriverId);
+      const nextPassenger = getPersonById(people as People[], nextPassengerNode.passengerId)
+      const minDriver = getPersonById(people as People[], nextPassengerNode.minDriverId);
 
       if(!nextPassenger || !minDriver) continue;
 
@@ -158,7 +181,6 @@ function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
 
     if(remainingPassengers.length===0) {
       let driverToBeConverted = getSomeoneDrivingNoOne(remainingDrivers, solution);
-      console.log(driverToBeConverted)
       if (driverToBeConverted) {
         // exists
         remainingPassengers.push(driverToBeConverted);
@@ -167,9 +189,7 @@ function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
         break;
       }
     }
-    console.log("END WHILE", remainingPassengers, remainingDrivers)
   }
-  console.log(solution)
   return strMapToObj(solution);
 }
 
