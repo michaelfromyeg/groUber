@@ -82,6 +82,7 @@ function GuestForm() {
                 latlng,
                 address,
             },
+            event: event.ref,
         });
 
         await event.ref.update({
