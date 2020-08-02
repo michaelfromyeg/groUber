@@ -32,7 +32,7 @@ Now, drivers won’t have to waste gas, and everyone will get there on time. Som
 
 groUber is ride-sharing for your group of friends, without all the expenses and overhead. Do a favor for the environment, and for your stress-levels, and start using groUber today.
 
-Here's our [whitepaper](https://docs.google.com/document/d/e/2PACX-1vSLo8DhZ7p-VgPnmieasD01zZ2_76uMxPxSwVErq3_gQPvpokrFI4G5SHA1Pxrc9b9ouhK5yvL-4X3t/pub) where you can find a more in-depth justification for this hack!
+Here's our [whitepaper](https://docs.google.com/document/d/e/2PACX-1vSLo8DhZ7p-VgPnmieasD01zZ2_76uMxPxSwVErq3_gQPvpokrFI4G5SHA1Pxrc9b9ouhK5yvL-4X3t/pub) where you can find a more in-depth justification for this hack! We also have a [slide deck](https://docs.google.com/presentation/d/e/2PACX-1vRY4A2dxP3vd1L7tY9gNC1Y0oegweKaiE9ZRHzulQArcLDld2zxErJQPk2TWvtwONXqdFWSECFlWEhh/pub?start=false&loop=false&delayms=15000) for the visual learners out there.
 
 ## Installation
 
