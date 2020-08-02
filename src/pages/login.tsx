@@ -2,6 +2,7 @@ import React, { ReactElement } from 'react';
 import styles from '../styles/App.module.scss';
 import LoginForm from '../components/LoginForm';
 import { Grid, Hidden } from '@material-ui/core';
+import  DemoCard  from '../components/DemoCard';
 
 const index = (): ReactElement => {
     return (
@@ -17,6 +18,8 @@ const index = (): ReactElement => {
                         </header>
                     </div>
                     <LoginForm />
+                    
+                <DemoCard />
                 </Grid>
                 <Hidden mdDown>
                     <Grid
@@ -31,6 +34,7 @@ const index = (): ReactElement => {
                         }}
                     />
                 </Hidden>
+
             </Grid>
         </div>
     );
