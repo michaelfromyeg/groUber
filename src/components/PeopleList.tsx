@@ -137,10 +137,6 @@ export default function ListView(props: any) {
                 {members.length === 0 && <h2 style={{ marginLeft: '37px', marginRight: '37px' }}> No members yet </h2>}
             </List>
             <br />
-            <Button variant="contained" color="secondary">
-                Find optimal route
-            </Button>
-            <br />
             <br />
             <Button
                 variant="contained"
