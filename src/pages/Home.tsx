@@ -35,7 +35,7 @@ const Home = (): ReactElement => {
                 eventSnapshot?.map(async (doc) => {
                     const eventRef = doc.event as firebase.firestore.DocumentReference<firebase.firestore.DocumentData>;
                     const event = await eventRef?.get();
-                    if (event) events.push({ id: event.id, ...event.data() });
+                    if (event) events.push({ id: event.id, ...(event.data() as Event) });
                 }),
             );
             setEvents(events);

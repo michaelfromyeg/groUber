@@ -8,9 +8,6 @@ export default function useEventPeople(event: Event): People[] {
 
     useEffect(() => {
         if (event) {
-            (event.people as firebase.firestore.DocumentReference[]).push(
-                event.host as firebase.firestore.DocumentReference,
-            );
             Promise.all(
                 (event.people as firebase.firestore.DocumentReference[]).map(
                     async (person: firebase.firestore.DocumentReference) => {

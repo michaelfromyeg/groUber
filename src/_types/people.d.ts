@@ -13,8 +13,8 @@ export interface People {
     location: {
         address: Address;
         latlng: {
-            lat: double;
-            lng: double;
+            lat: number;
+            lng: number;
         };
     };
 }
