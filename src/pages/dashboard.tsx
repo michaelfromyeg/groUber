@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as firebase from 'firebase';
 import { Event } from '../_types/event';
 import { useParams, useHistory } from 'react-router-dom';
@@ -7,6 +7,7 @@ import Map from '../components/Map';
 import ListView from '../components/PeopleList';
 import useEventPeople from 'src/hooks/useEventPeople';
 import Header from '../components/Header';
+import { Hidden, Drawer } from '@material-ui/core';
 
 //eslint-disable-next-line
 const globalAny: any = global
@@ -14,6 +15,7 @@ const globalAny: any = global
 const Dashboard = () => {
     const { eventId } = useParams();
     const history = useHistory();
+    const [sidebarOpen, setSidebarOpen] = useState(true);
 
     // const [eventCoord, setEventCoord] = useState({
     //     lat: 0.0,
@@ -58,11 +60,19 @@ const Dashboard = () => {
 
     return (
         <>
-            <Header />
-            {/* Load map */}
-            {/* Load side-menu */}
+            <Header setSidebarOpen={setSidebarOpen} />
             <div style={{ display: 'flex' }}>
-                <ListView members={people} />
+                <Drawer
+                    variant="persistent"
+                    anchor="left"
+                    open={sidebarOpen}
+                    onClose={() => {
+                        setSidebarOpen(false);
+                    }}
+                >
+                    <ListView setSidebarOpen={setSidebarOpen} members={people} />
+                </Drawer>
+                {/* <Hidden mdDown></Hidden> */}
                 <Map center={event ? event.destination.latlng : { lat: 0, lng: 0 }} />
             </div>
         </>
