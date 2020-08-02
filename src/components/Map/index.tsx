@@ -13,7 +13,7 @@ import { useFetch } from 'src/hooks/UseFetch';
 import { Client, Status } from '@googlemaps/google-maps-services-js';
 
 const client = new Client({});
-const key = 'AIzaSyD2mfMm4KHPGErUYWr3bNFwALDVP-EKkXc';
+const key = 'AIzaSyCBcFhe366d-l6wIvrX2lNfsmuthtkZKGM';
 
 const MapContainer = ({ google, center }: { google: any; center: google.maps.LatLngLiteral }): ReactElement => {
     // each polyline represents a route for a driver.
@@ -63,34 +63,30 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
     const generatePaths = async () => {
         // console.log('generate paths');
         for (const route of answer) {
-            const destination = route[route.length - 1];
-            const begin = route[0];
+            const destination = eventData.destination.latlng.lat + '%2C' + eventData.destination.latlng.lng;
+            const begin = route[0].lat + '%2C' + route[0].lng;
             let response;
-            if (route.length > 3) {
-                let waypoint = 'waypoints=';
+            if (route.length >= 2) {
+                let waypoint = '';
                 // , === %2C
                 // | seperate locations
-                for (let i = 1; i < route.length - 1; i++) {
-                    if (i == route.length - 2) {
-                        waypoint = waypoint + route[i].lat + '%2C' + route[i].lat;
+                for (let i = 1; i < route.length; i++) {
+                    if (i == route.length - 1) {
+                        waypoint = waypoint + route[i].lat + '%2C' + route[i].lng;
                     } else {
-                        waypoint = waypoint + route[i].lat + '%2C' + route[i].lat + '|';
+                        waypoint = waypoint + route[i].lat + '%2C' + route[i].lng + '|';
                     }
                 }
                 // const response = await axios.get(
                 //     `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&${waypoint}&key=${key}`,
                 // );
-                route.pop();
-                route.unshift();
+                route.shift();
 
-                response = await client.directions({
-                    params: {
-                        origin: begin,
-                        destination: destination,
-                        waypoints: route,
-                        key,
-                    },
-                });
+                response = await axios.post('https://us-central1-find-my-carpool.cloudfunctions.net/directions', {
+                    destination,
+                    origin,
+                    waypoints: waypoint,
+                })
 
                 // console.log(response);
             }
@@ -101,19 +97,17 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
                 // );
                 // console.log(response);
                 console.log(origin, destination);
-                response = await client.directions({
-                    params: {
-                        origin: begin,
-                        destination: destination,
-                        key,
-                    },
-                });
-                console.log('response: ' + response);
+                response = await axios.post('https://us-central1-find-my-carpool.cloudfunctions.net/directions', {
+                    destination,
+                    origin
+                })
             }
 
-            newPath.push(google.maps.geometry.encoding.decodePath(response.data.routes[0].overview_polyline.points));
+            // newPath.push('_h~jHpbtnVBgg@?eb@BiW@{G@uH@_E?_F}EB{NDuD?aF@sB?gCGeE?sQ?yID{DAmCBeAJYJ[RaAp@]HqEFuF?oBIsE?uCA?k@@{EiCAKEGQAY?}E')
+            newPath.push(google.maps.geometry.encoding.decodePath(response.data.routes[0].overview_polyline.points.replace('\\', '\\\\')));
         }
     };
+
 
     // console.log(window.google);
     if (google.maps.geometry) {
@@ -145,7 +139,7 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
                 );
             })}
             {newPath.map((path: any) => {
-                const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+                const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
                 return <Polyline key="" path={path} strokeColor={randomColor} strokeOpacity={1} strokeWeight={3} />;
             })}
         </Map>
