@@ -61,7 +61,7 @@ function GuestForm() {
 
     const [checked, setChecked] = React.useState(false);
 
-    const eventData: Event = event?.data();
+    const eventData: Event = event?.data() as Event;
     const eventHost = (eventData?.host as unknown) as firebase.firestore.DocumentReference;
     eventHost?.get()?.then((host) => {
         setHost(host.data() as People);
