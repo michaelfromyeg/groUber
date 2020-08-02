@@ -66,15 +66,15 @@ Participants must submit their address, if they're driving, and if so, how many 
 ### Examples
 
 <p align="center">
-  <img width="50%" src="images/branding.png">
+  <img width="90%" src="images/branding.png">
 </p>
 
 <p align="center">
-  <img width="50%" src="images/homescreen.png">
+  <img width="90%" src="images/homescreen.png">
 </p>
 
 <p align="center">
-  <img width="50%" src="images/dashboard.png">
+  <img width="90%" src="images/dashboard.png">
 </p>
 
 ## Contributing
