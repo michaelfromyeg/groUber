@@ -13,14 +13,14 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export default function LinkDisplay() {
+export default function LinkDisplay(props: any) {
     const classes = useStyles();
 
     return (
         <TextField
             id="standard-read-only-input"
             label="Read Only"
-            defaultValue="Link To API here"
+            defaultValue={props.link}
             InputProps={{
                 readOnly: true,
             }}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import * as firebase from 'firebase';
 import { Event } from '../_types/event';
 import { useParams, useHistory } from 'react-router-dom';
@@ -14,10 +14,11 @@ const globalAny: any = global
 const Dashboard = () => {
     const { eventId } = useParams();
     const history = useHistory();
-    const [coord, setCoord] = useState({
-        lat: 0.0,
-        lng: 0.0,
-    });
+
+    // const [eventCoord, setEventCoord] = useState({
+    //     lat: 0.0,
+    //     lng: 0.0,
+    // });
 
     const [event, loading] = useDocumentData<Event>(firebase.firestore().collection('events').doc(eventId), {
         snapshotListenOptions: {
@@ -26,41 +27,43 @@ const Dashboard = () => {
     });
 
     const people = useEventPeople(event);
-    console.log(people);
 
     if (!loading && !event) {
         globalAny.setNotification('error', 'Event not found.');
         history.push('/');
     }
 
-    useEffect(() => {
-        const showPosition = (position: any) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            console.log(lat, lng);
-            setCoord({
-                lat: lat,
-                lng: lng,
-            });
-        };
+    // useEffect(() => {
+    //     const showPosition = (position: any) => {
+    //         const lat = position.coords.latitude;
+    //         const lng = position.coords.longitude;
+    //         console.log(lat, lng);
+    //         setCoord({
+    //             lat: lat,
+    //             lng: lng,
+    //         });
+    //     };
 
-        // get user current location
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
-            alert(`Your browser doesn't support maps. Sorry about that :(`);
-        }
-    }, []);
+    // Get the location of event
+
+    // useEffect(() => {
+    //     for (let i = 0; i < people.length; i++) {
+    //         if (people[i].isHost) {
+    //             const host = people[i];
+    //             people.splice(i, 1);
+    //             setEventCoord(host.location.latlng);
+    //         }
+    //     }
+    // }, []);
 
     return (
         <>
             <Header />
-
             {/* Load map */}
             {/* Load side-menu */}
             <div style={{ display: 'flex' }}>
                 <ListView members={people} />
-                <Map center={coord} />
+                <Map center={event ? event.destination.latlng : { lat: 0, lng: 0 }} />
             </div>
         </>
     );
