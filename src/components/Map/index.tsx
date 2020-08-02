@@ -23,7 +23,7 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
             zoom={13}
             styles={theme}
             initialCenter={center}
-            containerStyle={{ height: 'calc(100vh - 64px)', width: '82.5vw' }}
+            containerStyle={{ height: 'calc(100vh - 64px)', width: '100vw' }}
         >
             <Marker label={'Destination'} position={center}></Marker>
             {members.map((person: People) => {
