@@ -1,7 +1,6 @@
 import { Address } from './address';
 
 export interface People {
-    event: any;
     id: string;
     name: string;
     email: string;
@@ -10,6 +9,7 @@ export interface People {
     canDrive: boolean;
     seats: number;
     isHost?: boolean;
+    event?: Event | firebase.firestore.DocumentReference;
     location: {
         address: Address;
         latlng: {
