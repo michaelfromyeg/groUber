@@ -24,13 +24,13 @@ class DistanceMatrix {
         const destinations = apiData.destinations;
         const matrix = apiData.matrix;
         for (let i = 0; i < origins.length; i++) {
-            let distances = new CustomMap();
-            let startLoc = {
+            const distances = new CustomMap();
+            const startLoc = {
                 latitude: this.people[i].location.latlng.lat,
                 longitude: this.people[i].location.latlng.lng,
             };
             for (let j = 0; j < destinations.length; j++) {
-                let endLoc = {
+                const endLoc = {
                     latitude: this.people[j].location.latlng.lat,
                     longitude: this.people[j].location.latlng.lng,
                 };
@@ -40,19 +40,19 @@ class DistanceMatrix {
         }
     }
     async grabMatrixDataFromRadar(people) {
-        let locations = people.map((person) => {
+        const locations = people.map((person) => {
             return `${person.location.latlng.lat},${person.location.latlng.lng}`;
         });
-        let result = await axios_1.default.get('https://api.radar.io/v1/route/matrix', {
+        const result = await axios_1.default.get('https://api.radar.io/v1/route/matrix', {
             params: {
                 origins: locations.join('|'),
                 destinations: locations.join('|'),
-                mode: "car",
-                units: "metric"
+                mode: 'car',
+                units: 'metric',
             },
             headers: {
-                'Authorization': `prj_live_pk_7a9bbe078da0cfa051f77e2c9d9d0f929b9e5955`
-            }
+                Authorization: `prj_live_pk_7a9bbe078da0cfa051f77e2c9d9d0f929b9e5955`,
+            },
         });
         return result.data;
     }
@@ -66,7 +66,7 @@ class CustomMap {
         this.values = [];
     }
     set(key, value) {
-        var index = this.findIndex(key);
+        const index = this.findIndex(key);
         if (index == -1) {
             this.keys.push(key);
             this.values.push(value);
@@ -80,7 +80,7 @@ class CustomMap {
     }
     findIndex(key) {
         for (let i = 0; i < this.keys.length; i++) {
-            let item = this.keys[i];
+            const item = this.keys[i];
             if (item.latitude === key.latitude && item.longitude === key.longitude) {
                 return i;
             }

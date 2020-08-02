@@ -26,13 +26,14 @@ admin.initializeApp(firebaseConfig);
 export const directions = functions.https.onRequest(
     async (request: any, response: any): Promise<void> => {
         response.set('Access-Control-Allow-Origin', '*');
+        const key = functions.config().directions.key;
         if (request.method !== 'POST') {
             response.status(405).json({ message: 'Method Not Allowed.' });
             return;
         } else if (!request.get('Access-Token')) {
             response.status(401).json({ message: 'Unauthorized.' });
             return;
-        } else if (!process.env.key) {
+        } else if (!key) {
             response.status(403).json({ message: 'Service Unavailable' });
             return;
         } else {
@@ -45,7 +46,7 @@ export const directions = functions.https.onRequest(
                     console.log(request.body.destination);
                     const axiosResult = await axios({
                         method: 'GET',
-                        url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${process.env.key}&origin=${request.body.origin}`,
+                        url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${key}&origin=${request.body.origin}`,
                     });
                     response.json(axiosResult.data);
                     return;

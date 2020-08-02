@@ -27,7 +27,6 @@ const functions = __importStar(require("firebase-functions"));
 const DistanceMatrix_1 = require("./DistanceMatrix");
 const firebase = __importStar(require("firebase"));
 const admin = __importStar(require("firebase-admin"));
-// import { PriorityQueue, Node } from './PriorityQueue'
 const priorityqueue_1 = __importDefault(require("priorityqueue"));
 require("firebase/firestore");
 const axios_1 = __importDefault(require("axios"));
@@ -43,11 +42,9 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 admin.initializeApp(firebaseConfig);
-process.env.key = 'AIzaSyAuzFugM9P3wIs0t_mDggEuNTMRl1aPync';
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
 exports.directions = functions.https.onRequest(async (request, response) => {
     response.set('Access-Control-Allow-Origin', '*');
+    const key = functions.config().directions.key;
     if (request.method !== 'POST') {
         response.status(405).json({ message: 'Method Not Allowed.' });
         return;
@@ -56,7 +53,7 @@ exports.directions = functions.https.onRequest(async (request, response) => {
         response.status(401).json({ message: 'Unauthorized.' });
         return;
     }
-    else if (!process.env.key) {
+    else if (!key) {
         response.status(403).json({ message: 'Service Unavailable' });
         return;
     }
@@ -71,7 +68,7 @@ exports.directions = functions.https.onRequest(async (request, response) => {
                 console.log(request.body.destination);
                 const axiosResult = await axios_1.default({
                     method: 'GET',
-                    url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${process.env.key}&origin=${request.body.origin}`,
+                    url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${key}&origin=${request.body.origin}`,
                 });
                 response.json(axiosResult.data);
                 return;
