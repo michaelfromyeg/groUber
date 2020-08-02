@@ -1,13 +1,16 @@
 import React, { ReactElement } from 'react';
-import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
+import { Map, GoogleApiWrapper, Marker, Polyline } from 'google-maps-react';
 import theme from './theme';
 import useEventPeople from '../../hooks/useEventPeople';
 import { useParams } from 'react-router-dom';
 import { useDocument } from 'react-firebase-hooks/firestore';
 import firebase from 'firebase';
 import { People } from 'src/_types/people';
+import idToLatLngFunc from './id-to-lat-lng.js';
 
 const MapContainer = ({ google, center }: { google: any; center: google.maps.LatLngLiteral }): ReactElement => {
+    // each polyline represents a route for a driver.
+
     const { eventId } = useParams();
     const [eventData, loading, error] = useDocument(firebase.firestore().collection('events').doc(eventId), {
         snapshotListenOptions: {
@@ -15,7 +18,8 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
         },
     });
     const members = useEventPeople(eventData);
-    console.log(members);
+    const idToLatLng = idToLatLngFunc(members);
+    console.log(idToLatLng);
     return (
         <Map
             google={google}
@@ -38,6 +42,17 @@ const MapContainer = ({ google, center }: { google: any; center: google.maps.Lat
                     />
                 );
             })}
+            <Polyline
+                path={[
+                    { lat: 25.774, lng: -80.19 },
+                    { lat: 18.466, lng: -66.118 },
+                    { lat: 32.321, lng: -64.757 },
+                    { lat: 25.774, lng: -80.19 },
+                ]}
+                strokeColor="#0000FF"
+                strokeOpacity={0.8}
+                strokeWeight={2}
+            />
         </Map>
     );
 };
