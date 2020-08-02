@@ -14,8 +14,10 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@types/cors": "^2.8.7",
     "@types/node": "^14.0.27",
     "axios": "^0.19.2",
+    "cors": "^2.8.5",
     "firebase": "^7.17.1",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.1",

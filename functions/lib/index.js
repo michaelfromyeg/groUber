@@ -30,6 +30,8 @@ const admin = __importStar(require("firebase-admin"));
 const priorityqueue_1 = __importDefault(require("priorityqueue"));
 require("firebase/firestore");
 const axios_1 = __importDefault(require("axios"));
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cors = require('cors')();
 const firebaseConfig = {
     apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
     authDomain: 'find-my-carpool.firebaseapp.com',
@@ -43,42 +45,44 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 admin.initializeApp(firebaseConfig);
 exports.directions = functions.https.onRequest(async (request, response) => {
-    response.set('Access-Control-Allow-Origin', '*');
-    const key = functions.config().directions.key;
-    if (request.method !== 'POST') {
-        response.status(405).json({ message: 'Method Not Allowed.' });
-        return;
-    }
-    else if (!request.get('Access-Token')) {
-        response.status(401).json({ message: 'Unauthorized.' });
-        return;
-    }
-    else if (!key) {
-        response.status(403).json({ message: 'Service Unavailable' });
-        return;
-    }
-    else {
-        try {
-            const verify = await admin.auth().verifyIdToken(request.get('Access-Token'));
-            if (!verify.uid) {
-                response.status(403).json({ message: 'Service Unavailable' });
-                return;
-            }
-            else {
-                console.log(request.body.destination);
-                const axiosResult = await axios_1.default({
-                    method: 'GET',
-                    url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${key}&origin=${request.body.origin}`,
-                });
-                response.json(axiosResult.data);
-                return;
-            }
-        }
-        catch (err) {
-            response.status(401).json({ message: err.message });
+    cors(request, response, async () => {
+        response.set('Access-Control-Allow-Origin', '*');
+        const key = functions.config().directions.key;
+        if (request.method !== 'POST') {
+            response.status(405).json({ message: 'Method Not Allowed.' });
             return;
         }
-    }
+        else if (!request.get('Access-Token')) {
+            response.status(401).json({ message: 'Unauthorized.' });
+            return;
+        }
+        else if (!key) {
+            response.status(403).json({ message: 'Service Unavailable' });
+            return;
+        }
+        else {
+            try {
+                const verify = await admin.auth().verifyIdToken(request.get('Access-Token'));
+                if (!verify.uid) {
+                    response.status(403).json({ message: 'Service Unavailable' });
+                    return;
+                }
+                else {
+                    console.log(request.body.destination);
+                    const axiosResult = await axios_1.default({
+                        method: 'GET',
+                        url: `https://maps.googleapis.com/maps/api/directions/json?destination=${request.body.destination}&key=${key}&origin=${request.body.origin}&waypoints=${request.body.waypoints}`,
+                    });
+                    response.json(axiosResult.data);
+                    return;
+                }
+            }
+            catch (err) {
+                response.status(401).json({ message: err.message });
+                return;
+            }
+        }
+    });
 });
 exports.solve = functions.https.onRequest(async (request, response) => {
     response.set('Access-Control-Allow-Origin', '*');

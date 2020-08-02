@@ -9,6 +9,9 @@ import PriorityQueue from 'priorityqueue';
 import 'firebase/firestore';
 import axios from 'axios';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cors = require('cors')();
+
 const firebaseConfig = {
     apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
     authDomain: 'find-my-carpool.firebaseapp.com',
@@ -23,8 +26,8 @@ firebase.initializeApp(firebaseConfig);
 
 admin.initializeApp(firebaseConfig);
 
-export const directions = functions.https.onRequest(
-    async (request: any, response: any): Promise<void> => {
+export const directions = functions.https.onRequest(async (request: any, response: any) => {
+    cors(request, response, async () => {
         response.set('Access-Control-Allow-Origin', '*');
         const key = functions.config().directions.key;
         if (request.method !== 'POST') {
@@ -56,8 +59,8 @@ export const directions = functions.https.onRequest(
                 return;
             }
         }
-    },
-);
+    });
+});
 
 export const solve = functions.https.onRequest(async (request: any, response: any) => {
     response.set('Access-Control-Allow-Origin', '*');
