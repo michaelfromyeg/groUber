@@ -63,7 +63,7 @@ const Dashboard = () => {
             <Header setSidebarOpen={setSidebarOpen} />
             <div style={{ display: 'flex' }}>
                 <Drawer
-                    variant="temporary"
+                    variant="persistent"
                     anchor="left"
                     open={sidebarOpen}
                     onClose={() => {
