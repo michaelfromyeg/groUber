@@ -1,49 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import * as firebase from 'firebase';
 import { Event } from '../_types/event';
 import { useParams, useHistory } from 'react-router-dom';
-import { useDocument } from 'react-firebase-hooks/firestore';
-import { AppBar, Toolbar, IconButton, Typography, Button, makeStyles, Grid } from '@material-ui/core';
-import classes from '*.module.css';
-import BackIcon from '@material-ui/icons/ArrowBackIosRounded';
+import { useDocumentData } from 'react-firebase-hooks/firestore';
 import Map from '../components/Map';
 import ListView from '../components/PeopleList';
 import useEventPeople from 'src/hooks/useEventPeople';
 import Header from '../components/Header';
-
-const useStyles = makeStyles((theme) => ({
-    menuButton: {
-        marginRight: theme.spacing(2),
-    },
-}));
+import { Hidden, Drawer } from '@material-ui/core';
 
 //eslint-disable-next-line
 const globalAny: any = global
 
 const Dashboard = () => {
-    // const classes = useStyles();
     const { eventId } = useParams();
     const history = useHistory();
+    const [sidebarOpen, setSidebarOpen] = useState(true);
 
     // const [eventCoord, setEventCoord] = useState({
     //     lat: 0.0,
     //     lng: 0.0,
     // });
 
-    const [eventData, loading, error] = useDocument(firebase.firestore().collection('events').doc(eventId), {
+    const [event, loading] = useDocumentData<Event>(firebase.firestore().collection('events').doc(eventId), {
         snapshotListenOptions: {
             includeMetadataChanges: true,
         },
     });
 
-    const people = useEventPeople(eventData);
+    const people = useEventPeople(event);
 
-    if (!loading && !eventData?.data()) {
+    if (!loading && !event) {
         globalAny.setNotification('error', 'Event not found.');
         history.push('/');
     }
 
-    const event = eventData?.data();
+    // useEffect(() => {
+    //     const showPosition = (position: any) => {
+    //         const lat = position.coords.latitude;
+    //         const lng = position.coords.longitude;
+    //         console.log(lat, lng);
+    //         setCoord({
+    //             lat: lat,
+    //             lng: lng,
+    //         });
+    //     };
 
     // Get the location of event
 
@@ -59,12 +60,20 @@ const Dashboard = () => {
 
     return (
         <>
-            <Header />
-            {/* Load map */}
-            {/* Load side-menu */}
+            <Header setSidebarOpen={setSidebarOpen} />
             <div style={{ display: 'flex' }}>
-                <ListView members={people} />
-                <Map center={event ? event.destination.latlng : []} />
+                <Drawer
+                    variant="temporary"
+                    anchor="left"
+                    open={sidebarOpen}
+                    onClose={() => {
+                        setSidebarOpen(false);
+                    }}
+                >
+                    <ListView setSidebarOpen={setSidebarOpen} members={people} />
+                </Drawer>
+                {/* <Hidden mdDown></Hidden> */}
+                <Map center={event ? event.destination.latlng : { lat: 0, lng: 0 }} />
             </div>
         </>
     );

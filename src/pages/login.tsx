@@ -29,12 +29,7 @@ const index = (): ReactElement => {
                             backgroundSize: 'cover',
                             backgroundPositionY: '80%',
                         }}
-                    >
-                        {/* <img
-              src="/login_art.png"
-              style={{ width: 'auto', height: '100vh' }}
-            /> */}
-                    </Grid>
+                    />
                 </Hidden>
             </Grid>
         </div>

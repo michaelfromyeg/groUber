@@ -1,22 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import * as firebase from 'firebase';
-import { useHistory, useParams } from 'react-router-dom';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng, Suggestion } from 'react-places-autocomplete';
+import { useParams } from 'react-router-dom';
 import useAutoCompletePlaces from '../hooks/UseAutocompletePlaces';
-import { Radio, Collapse, Divider } from '@material-ui/core';
+import { Collapse, CircularProgress } from '@material-ui/core';
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { Event } from '../_types/event';
 import 'firebase/auth';
@@ -44,12 +39,11 @@ const useStyles = makeStyles((theme) => ({
 
 function GuestForm() {
     const classes = useStyles();
-    const history = useHistory();
     const db = firebase.firestore();
     const { eventId } = useParams();
     const [host, setHost] = useState<People>(null);
 
-    const [event, loading, error] = useDocument(firebase.firestore().collection('events').doc(eventId), {
+    const [event, loading] = useDocument(firebase.firestore().collection('events').doc(eventId), {
         snapshotListenOptions: {
             includeMetadataChanges: true,
         },
@@ -62,13 +56,14 @@ function GuestForm() {
     const [checked, setChecked] = React.useState(false);
 
     const eventData: Event = event?.data() as Event;
-    const eventHost = (eventData?.host as unknown) as firebase.firestore.DocumentReference;
-    eventHost?.get()?.then((host) => {
-        setHost(host.data() as People);
-    });
+    useEffect(() => {
+        const eventHost = eventData?.host as firebase.firestore.DocumentReference;
+        eventHost?.get()?.then((host) => {
+            setHost(host.data() as People);
+        });
+    }, [event]);
 
     const currentUser = firebase.auth().currentUser;
-    console.log(currentUser);
     async function handleSubmit(e: any) {
         e.preventDefault();
         const result = await db.collection('people').add({
@@ -94,7 +89,9 @@ function GuestForm() {
 
     return (
         <>
-            {!submitted ? (
+            {loading ? (
+                <CircularProgress />
+            ) : !submitted ? (
                 <Container component="main" maxWidth="xs">
                     <CssBaseline />
                     <div className={classes.paper}>
@@ -104,6 +101,9 @@ function GuestForm() {
                         <br />
                         <Typography component="h1" variant="h5">
                             This event is at {eventData?.destination?.address}.
+                            <br />
+                            <br />
+                            It is happening on {new Date((eventData?.date as any)?.seconds * 1000).toString()}.
                         </Typography>
                         <br />
                         <Typography component="h3" variant="h6">
