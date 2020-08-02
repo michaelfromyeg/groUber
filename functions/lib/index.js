@@ -29,7 +29,6 @@ const DistanceMatrix_1 = require("./DistanceMatrix");
 const priorityqueue_1 = __importDefault(require("priorityqueue"));
 const firebase = __importStar(require("firebase"));
 require("firebase/firestore");
-const key = 'prj_live_pk_7a9bbe078da0cfa051f77e2c9d9d0f929b9e5955';
 const firebaseConfig = {
     apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
     authDomain: 'find-my-carpool.firebaseapp.com',
@@ -44,15 +43,16 @@ firebase.initializeApp(firebaseConfig);
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 exports.solve = functions.https.onRequest(async (request, response) => {
-    functions.logger.info("Hello logs!", { structuredData: true });
+    response.set('Access-Control-Allow-Origin', '*');
+    functions.logger.info('Hello logs!', { structuredData: true });
     // grab event first
-    let result = await firebase.firestore().collection("events").doc(request.query.eventId).get();
-    let event = result.data();
+    const result = await firebase.firestore().collection('events').doc(request.query.eventId).get();
+    const event = result.data();
     if (!event) {
-        response.json("error couldnt find event");
+        response.json('error couldnt find event');
         return;
     }
-    let people = await Promise.all(event.people.map(async (person) => {
+    const people = await Promise.all(event.people.map(async (person) => {
         const personRef = await person.get();
         return Object.assign({ id: person.id }, personRef.data());
     }));
@@ -71,7 +71,7 @@ async function solveCarpoolProblem(event) {
     const people = event.people;
     let remainingDrivers = getDrivers(people);
     let remainingPassengers = getPassengers(people);
-    let distanceMatrix = new DistanceMatrix_1.DistanceMatrix(people);
+    const distanceMatrix = new DistanceMatrix_1.DistanceMatrix(people);
     await distanceMatrix.init();
     const solution = new Map();
     while (!isDone(remainingDrivers, remainingPassengers)) {
@@ -80,10 +80,10 @@ async function solveCarpoolProblem(event) {
         // const distances = calculatePassengerDistances(remainingDrivers, remainingPassengers);
         if (remainingPassengers.length > 0) {
             const closestDriverToPassengers = new Map();
-            for (let passenger of remainingPassengers) {
+            for (const passenger of remainingPassengers) {
                 let minDriverDistance = Infinity;
-                let minDriverId = "";
-                for (let driver of remainingDrivers) {
+                let minDriverId = '';
+                for (const driver of remainingDrivers) {
                     //   // calc distance between driver and passenger
                     //   console.log("this shit ran")
                     //   console.log(distanceMatrix.data.keys, distanceMatrix.data.values)
@@ -93,13 +93,13 @@ async function solveCarpoolProblem(event) {
                     // })
                     const distanceMap = distanceMatrix.data.get({
                         latitude: driver.location.latlng.lat,
-                        longitude: driver.location.latlng.lng
+                        longitude: driver.location.latlng.lng,
                     });
                     const distance = distanceMap.get({
                         latitude: passenger.location.latlng.lat,
-                        longitude: passenger.location.latlng.lng
+                        longitude: passenger.location.latlng.lng,
                     });
-                    console.log(distance, " from ", passenger.name, driver.name);
+                    console.log(distance, ' from ', passenger.name, driver.name);
                     // const distance = haversine({
                     //   latitude: driver.location.latlng.lat,
                     //   longitude: driver.location.latlng.lng,
@@ -118,13 +118,13 @@ async function solveCarpoolProblem(event) {
             const comparator = (a, b) => {
                 return numericCompare(a.minDriverDistance, b.minDriverDistance);
             };
-            let pq = new priorityqueue_1.default({ comparator });
-            for (let passenger of remainingPassengers) {
+            const pq = new priorityqueue_1.default({ comparator });
+            for (const passenger of remainingPassengers) {
                 const array = closestDriverToPassengers.get(passenger.id);
                 if (!array)
                     continue;
                 const [minDriverId, minDriverDistance] = array;
-                let node = {
+                const node = {
                     passengerId: passenger.id,
                     minDriverId,
                     minDriverDistance,
@@ -140,7 +140,7 @@ async function solveCarpoolProblem(event) {
                 continue;
             minDriver.location.latlng = {
                 lat: nextPassenger === null || nextPassenger === void 0 ? void 0 : nextPassenger.location.latlng.lat,
-                lng: nextPassenger === null || nextPassenger === void 0 ? void 0 : nextPassenger.location.latlng.lng
+                lng: nextPassenger === null || nextPassenger === void 0 ? void 0 : nextPassenger.location.latlng.lng,
             };
             const passengerIds = solution.get(minDriver.id) || [];
             passengerIds.push(nextPassenger.id);
@@ -159,7 +159,7 @@ async function solveCarpoolProblem(event) {
             remainingDrivers = removePerson(remainingDrivers, remainingDrivers[0].id);
         }
         if (remainingPassengers.length === 0) {
-            let driverToBeConverted = getSomeoneDrivingNoOne(remainingDrivers, solution);
+            const driverToBeConverted = getSomeoneDrivingNoOne(remainingDrivers, solution);
             if (driverToBeConverted) {
                 // exists
                 remainingPassengers.push(driverToBeConverted);
@@ -173,8 +173,8 @@ async function solveCarpoolProblem(event) {
     return strMapToObj(solution);
 }
 function strMapToObj(strMap) {
-    let obj = Object.create(null);
-    for (let [k, v] of strMap) {
+    const obj = Object.create(null);
+    for (const [k, v] of strMap) {
         // We don’t escape the key '__proto__'
         // which can cause problems on older engines
         obj[k] = v;
@@ -182,7 +182,7 @@ function strMapToObj(strMap) {
     return obj;
 }
 function getSomeoneDrivingNoOne(drivers, solution) {
-    for (let driver of drivers) {
+    for (const driver of drivers) {
         if (!solution.has(driver.id)) {
             return driver;
         }
@@ -191,7 +191,7 @@ function getSomeoneDrivingNoOne(drivers, solution) {
 }
 function removePerson(people, id) {
     for (let i = 0; i < people.length; i++) {
-        let driver = people[i];
+        const driver = people[i];
         if (driver.id === id) {
             people.splice(i, 1);
         }

@@ -11,7 +11,7 @@ class DistanceMatrix {
      * @example distanceMatrix = new DistanceMatrix(people)
      */
     constructor(people) {
-        this.data = new CustomMap();
+        this.data = new CustomMap(); // number is the distance
         this.people = people;
     }
     /** generates data which is our map given a list of people.
@@ -19,8 +19,25 @@ class DistanceMatrix {
      * @example await distanceMatrix.init();
      */
     async init() {
-        const data = await this.grabMatrixDataFromRadar(this.people);
-        // use data here
+        const apiData = await this.grabMatrixDataFromRadar(this.people);
+        const origins = apiData.origins;
+        const destinations = apiData.destinations;
+        const matrix = apiData.matrix;
+        for (let i = 0; i < origins.length; i++) {
+            let distances = new CustomMap();
+            let startLoc = {
+                latitude: this.people[i].location.latlng.lat,
+                longitude: this.people[i].location.latlng.lng,
+            };
+            for (let j = 0; j < destinations.length; j++) {
+                let endLoc = {
+                    latitude: this.people[j].location.latlng.lat,
+                    longitude: this.people[j].location.latlng.lng,
+                };
+                distances.set(endLoc, matrix[i][j].distance.value);
+            }
+            this.data.set(startLoc, distances);
+        }
     }
     async grabMatrixDataFromRadar(people) {
         let locations = people.map((person) => {
@@ -31,7 +48,7 @@ class DistanceMatrix {
                 origins: locations.join('|'),
                 destinations: locations.join('|'),
                 mode: "car",
-                units: "imperial"
+                units: "metric"
             },
             headers: {
                 'Authorization': `prj_live_pk_7a9bbe078da0cfa051f77e2c9d9d0f929b9e5955`
@@ -49,7 +66,7 @@ class CustomMap {
         this.values = [];
     }
     set(key, value) {
-        var index = this.keys.indexOf(key);
+        var index = this.findIndex(key);
         if (index == -1) {
             this.keys.push(key);
             this.values.push(value);
@@ -59,7 +76,16 @@ class CustomMap {
         }
     }
     get(key) {
-        return this.values[this.keys.indexOf(key)];
+        return this.values[this.findIndex(key)];
+    }
+    findIndex(key) {
+        for (let i = 0; i < this.keys.length; i++) {
+            let item = this.keys[i];
+            if (item.latitude === key.latitude && item.longitude === key.longitude) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
 exports.CustomMap = CustomMap;
