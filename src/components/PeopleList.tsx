@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button';
 import { People } from '../_types/people';
 import { Link, useParams } from 'react-router-dom';
 import LinkDisplay from '../components/LinkDisplay';
+import { IconButton } from '@material-ui/core';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -21,6 +23,14 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         inline: {
             display: 'inline',
+        },
+        toolbar: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            padding: theme.spacing(0, 1),
+            // necessary for content to be below app bar
+            ...theme.mixins.toolbar,
         },
     }),
 );
@@ -59,6 +69,15 @@ export default function ListView(props: any) {
     return (
         <div style={{ textAlign: 'center' }}>
             <List className={classes.root} style={{ maxHeight: String(y) + 'px', overflow: 'auto' }}>
+                <div className={classes.toolbar}>
+                    <IconButton
+                        onClick={() => {
+                            props?.setSidebarOpen(false);
+                        }}
+                    >
+                        <ChevronLeftIcon />
+                    </IconButton>
+                </div>
                 {members.map((person: People) => (
                     <Person key={person.name} person={person} />
                 ))}
