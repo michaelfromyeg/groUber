@@ -29,6 +29,7 @@ const DistanceMatrix_1 = require("./DistanceMatrix");
 const priorityqueue_1 = __importDefault(require("priorityqueue"));
 const firebase = __importStar(require("firebase"));
 require("firebase/firestore");
+const key = 'prj_live_pk_7a9bbe078da0cfa051f77e2c9d9d0f929b9e5955';
 const firebaseConfig = {
     apiKey: 'AIzaSyDvCT-243TWt9Dwb9ChTOgfkFMUhIjTlRc',
     authDomain: 'find-my-carpool.firebaseapp.com',
