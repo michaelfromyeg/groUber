@@ -67,80 +67,95 @@ function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
 
   const solution = new Map<string, Array<string>>();
 
+  console.log(remainingPassengers, remainingDrivers)
+
   while (!isDone(remainingDrivers, remainingPassengers)) {
+
+    console.log(remainingPassengers, remainingDrivers)
+
+    if(remainingPassengers.length > 0 && remainingDrivers.length === 0) break;
     // const distances = calculatePassengerDistances(remainingDrivers, remainingPassengers);
 
-    const closestDriverToPassengers = new Map<string, [string, number]>();
+    if(remainingPassengers.length > 0){
 
-    for(let passenger of remainingPassengers) {
-      let minDriverDistance = Infinity;
-      let minDriverId = "";
-      for(let driver of remainingDrivers) {
-        const distance = haversine({
-          latitude: driver.location.latlng.lat,
-          longitude: driver.location.latlng.lng,
-        }, {
-          latitude: passenger.location.latlng.lat,
-          longitude: passenger.location.latlng.lng,
-        }, {unit: 'meter'})
+      const closestDriverToPassengers = new Map<string, [string, number]>();
 
-        if(distance < minDriverDistance) {
-          minDriverDistance = distance;
-          minDriverId = driver.id;
+      for(let passenger of remainingPassengers) {
+        let minDriverDistance = Infinity;
+        let minDriverId = "";
+        for(let driver of remainingDrivers) {
+          const distance = haversine({
+            latitude: driver.location.latlng.lat,
+            longitude: driver.location.latlng.lng,
+          }, {
+            latitude: passenger.location.latlng.lat,
+            longitude: passenger.location.latlng.lng,
+          }, {unit: 'meter'})
+
+          if(distance < minDriverDistance) {
+            minDriverDistance = distance;
+            minDriverId = driver.id;
+          }
         }
+
+        closestDriverToPassengers.set(passenger.id, [minDriverId, minDriverDistance]);
       }
 
-      closestDriverToPassengers.set(passenger.id, [minDriverId, minDriverDistance]);
-    }
+      const numericCompare = (a:number, b:number) => (a < b ? 1 : a > b ? -1 : 0);
 
-    const numericCompare = (a:number, b:number) => (a > b ? 1 : a < b ? -1 : 0);
+      const comparator = (a: any, b: any) => {
+        return numericCompare(a.minDriverDistance, b.minDriverDistance);
+      };
 
-    const comparator = (a: any, b: any) => {
-      return numericCompare(a.minDriverDistance, b.minDriverDistance);
-    };
+      let pq = new PriorityQueue({comparator});
 
-    let pq = new PriorityQueue({comparator});
+      for(let passenger of remainingPassengers) {
+        const array = closestDriverToPassengers.get(passenger.id);
+        if (!array) continue;
+        const [minDriverId, minDriverDistance] = array;
+        
+        let node = {
+          passengerId: passenger.id,
+          minDriverId,
+          minDriverDistance,
+        }
 
-    for(let passenger of remainingPassengers) {
-      const array = closestDriverToPassengers.get(passenger.id);
-      if (!array) continue;
-      const [minDriverId, minDriverDistance] = array;
-      
-      let node = {
-        passengerId: passenger.id,
-        minDriverId,
-        minDriverDistance,
+        pq.enqueue(node);
       }
 
-      pq.enqueue(node);
+      const nextPassengerNode: any = pq.dequeue();
+      if(!nextPassengerNode) continue;
+      const nextPassenger = getPersonById(people, nextPassengerNode.passengerId)
+      const minDriver = getPersonById(people, nextPassengerNode.minDriverId);
+
+      if(!nextPassenger || !minDriver) continue;
+
+      minDriver.location.latlng = {
+        lat: nextPassenger?.location.latlng.lat,
+        lng: nextPassenger?.location.latlng.lng
+      }
+
+      const passengerIds: string[] = solution.get(minDriver.id) || [];
+      passengerIds.push(nextPassenger.id)
+      solution.set(minDriver.id, passengerIds);
+
+      minDriver.seats--;
+      if(minDriver.seats === 0) {
+        remainingDrivers = removePerson(remainingDrivers, minDriver.id);
+      }
+      remainingPassengers = removePerson(remainingPassengers, nextPassenger.id);
+      // TODO add to database for visualization of this algorithm
     }
-
-    const nextPassengerNode: any = pq.dequeue();
-    if(!nextPassengerNode) continue;
-    const nextPassenger = getPersonById(people, nextPassengerNode.passengerId)
-    const minDriver = getPersonById(people, nextPassengerNode.minDriverId);
-
-    if(!nextPassenger || !minDriver) continue;
-
-    minDriver.location.latlng = {
-      lat: nextPassenger?.location.latlng.lat,
-      lng: nextPassenger?.location.latlng.lng
-    }
-
-    const passengerIds: string[] = solution.get(minDriver.id) || [];
-    passengerIds.push(nextPassenger.id)
-    solution.set(minDriver.id, passengerIds);
-
-    minDriver.seats--;
-    if(minDriver.seats === 0) {
-      remainingDrivers = removePerson(remainingDrivers, minDriver.id);
-    }
-    remainingPassengers = removePerson(remainingPassengers, nextPassenger.id);
-    // TODO add to database for visualization of this algorithm
-
     // no more remaining passengers but still have drivers
+    if(remainingDrivers.length === 1 && remainingPassengers.length === 0) {
+      if (!solution.has(remainingDrivers[0].id))
+        solution.set(remainingDrivers[0].id, [])
+      remainingDrivers = removePerson(remainingDrivers, remainingDrivers[0].id);
+    }
+
     if(remainingPassengers.length===0) {
       let driverToBeConverted = getSomeoneDrivingNoOne(remainingDrivers, solution);
+      console.log(driverToBeConverted)
       if (driverToBeConverted) {
         // exists
         remainingPassengers.push(driverToBeConverted);
@@ -149,6 +164,7 @@ function solveCarpoolProblem(event: Event): Map<string, Array<string>> {
         break;
       }
     }
+    console.log("END WHILE", remainingPassengers, remainingDrivers)
   }
   console.log(solution)
   return strMapToObj(solution);
@@ -166,7 +182,7 @@ function strMapToObj(strMap: any): any {
 
 function getSomeoneDrivingNoOne(drivers: People[], solution: Map<string, Array<string>>): People | undefined {
   for(let driver of drivers) {
-    if(solution.has(driver.id)) {
+    if(!solution.has(driver.id)) {
       return driver;
     }
   }
@@ -200,7 +216,7 @@ function getPersonById(people:People[], id:string): People | undefined {
  * @returns boolean
  */
 function isDone(drivers: People[], passengers: People[]) : boolean {
-  return drivers.length === 0 || passengers.length === 0;
+  return drivers.length === 0 && passengers.length === 0;
 }
 
 /** 
