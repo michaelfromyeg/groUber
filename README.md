@@ -1,3 +1,5 @@
+<h2 align="center">This repository is now deprecated, and development of groUber, now called rooter, is being continued <a href="https://github.com/getrooter">here</a>.</h2>
+
 <p align="center">
   <img width="15%" src="branding/logo/grouber-logo-01.svg">
 </p>
