@@ -44,7 +44,7 @@
     "react-firebase-hooks": "^2.2.0",
     "react-places-autocomplete": "^7.3.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.1",
+    "react-scripts": "5.0.1",
     "react-window": "^1.8.5",
     "tslint": "^6.1.2",
     "typescript": "^3.7.5"
